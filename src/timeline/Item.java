@@ -3,10 +3,18 @@ package timeline;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public interface Item extends Serializable
+import com.phyloa.dlib.renderer.Renderer;
+
+public interface Item extends Serializable, Comparable<Item>
 {
 	public boolean isVisible( TDate d, float zoom );
 	
 	public int getPriority();
 	public ArrayList<String> getTags();
+	public ArrayList<DoubleString> getData();
+	public String getData( String string );
+	public void setData( String a, String b );
+	public void renderInfo( Renderer r );
+
+	public TDate getCenter();
 }

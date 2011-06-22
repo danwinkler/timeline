@@ -1,8 +1,11 @@
 package timeline;
 
+import java.awt.FontMetrics;
+
+import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Renderer;
 
-public class EventRenderer implements ItemRenderer
+public class EventRenderer extends ItemRenderer
 {
 	int x = -100;
 	int y = -100;
@@ -16,15 +19,18 @@ public class EventRenderer implements ItemRenderer
 	public EventRenderer( Event e )
 	{
 		this.e = e;
+		item = e;
 	}
 	
-	public void render( Renderer r ) 
+	public void render( Renderer r, Item selected, Item hover ) 
 	{
+		boolean select = selected == e;
+		boolean hovered = hover == e;
 		r.pushMatrix();
 			r.translate( x, y );
 			r.color( 255, 255, 255 );
 			r.fillRect( 0, 0, width, height );
-			r.color( 0, 0, 0 );
+			r.color( select ? 255 : 0, 0, 0 );
 			r.text( e.name, 2, 11 );
 			r.text( e.date.toString(), 2, 23 );
 			r.drawRect( 0, 0, width, height );
@@ -65,7 +71,9 @@ public class EventRenderer implements ItemRenderer
 	
 	private int makeWidth( Timeline line, int dx )
 	{
-		return Math.max( strLen( e.name ), strLen( e.date.toString() ) );
+		Graphics2DIRenderer g2dr = ((Graphics2DIRenderer)line.r);
+		FontMetrics fm = g2dr.g.getFontMetrics();
+		return Math.max( fm.stringWidth( e.name ) + 5, fm.stringWidth( e.date.toString() ) + 5 );	
 	}
 	
 	private int strLen( String s )

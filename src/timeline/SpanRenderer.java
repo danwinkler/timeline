@@ -2,7 +2,7 @@ package timeline;
 
 import com.phyloa.dlib.renderer.Renderer;
 
-public class SpanRenderer implements ItemRenderer
+public class SpanRenderer extends ItemRenderer
 {
 	int x = -100;
 	int y = -100;
@@ -15,6 +15,7 @@ public class SpanRenderer implements ItemRenderer
 	public SpanRenderer( Span e )
 	{
 		this.e = e;
+		item = e;
 	}
 	
 	public void place( Timeline line )
@@ -48,13 +49,22 @@ public class SpanRenderer implements ItemRenderer
 		placed = true;
 	}
 	
-	public void render( Renderer r )
+	public void render( Renderer r, Item select, Item hover )
 	{
-		r.color( 0, 0, 0 );
+		boolean selected = select == e;
+		boolean hovered = hover == e;
+		r.color( selected ? 255 : 0, 0, 0 );
 		r.line( x, y, x, y+height );
 		r.line( x+width, y, x+width, y+height );
 		r.line( x, y+(height/2), x+width, y+(height/2) );
-		r.text( e.name, x+(width/2) - strLen( e.name )/2, y+(height/2) );
+		r.text( e.name, x+(width/2) - strLen( e.name )/2, y+(height/2)-1 );
+		
+		if( hovered )
+		{
+			r.color( 128, 128, 128, 128 );
+			r.line( x, y+height, x, r.getHeight()-100 );
+			r.line( x+width, y+height, x+width, r.getHeight()-100 );
+		}
 	}
 	
 	private int strLen( String s )
