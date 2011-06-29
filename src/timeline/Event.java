@@ -66,6 +66,20 @@ public class Event implements Item
 		{
 			rl.add( "Location: " + loc );	
 		}
+		rl.add( "Priority: " + priority );
+		if( tags.size() > 0 )
+		{
+			String tagsText = "";
+			for( int i = 0; i < tags.size(); i++ )
+			{
+				tagsText += tags.get( i );
+				if( i < tags.size() - 1 )
+				{
+					tagsText += ", ";
+				}
+			}
+			rl.add( "Tags: " + tagsText );
+		}
 		if( description != null && !description.equals( "" ) )
 		{
 			ArrayList<String> lines = Timeline.breakIntoLines( description, 40 );

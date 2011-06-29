@@ -18,6 +18,6 @@ public abstract class ItemRenderer implements Comparable<ItemRenderer>
 	
 	public int compareTo( ItemRenderer i ) 
 	{
-		return i.getY() < this.getY() ? 1 : -1;
+		return i.getY() < this.getY() ? -1 : 1;
 	}
 }

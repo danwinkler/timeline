@@ -1,5 +1,8 @@
 package timeline;
 
+import java.awt.FontMetrics;
+
+import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Renderer;
 
 public class SpanRenderer extends ItemRenderer
@@ -18,12 +21,16 @@ public class SpanRenderer extends ItemRenderer
 		item = e;
 	}
 	
+	@Override
 	public void place( Timeline line )
 	{
 		y = 20;
-		width = line.getDrawX( e.end ) - line.getDrawX( e.start );  
+		width = line.getDrawX( e.end ) - line.getDrawX( e.start ); 
 		x = line.getDrawX( e.start );
 		height = 26;
+		
+		width *= ((float)e.priority / 100.f) + 1;
+		height *= ((float)e.priority / 100.f) + 1;
 		while( true )
 		{
 			boolean found = true;
@@ -49,6 +56,7 @@ public class SpanRenderer extends ItemRenderer
 		placed = true;
 	}
 	
+	@Override
 	public void render( Renderer r, Item select, Item hover )
 	{
 		boolean selected = select == e;
@@ -58,6 +66,8 @@ public class SpanRenderer extends ItemRenderer
 		r.line( x+width, y, x+width, y+height );
 		r.line( x, y+(height/2), x+width, y+(height/2) );
 		r.text( e.name, x+(width/2) - strLen( e.name )/2, y+(height/2)-1 );
+		r.color( (e.priority / 100.f) * 255, 0, ((100-e.priority) / 100.f) * 255 );
+		r.fillOval( x + (width / 2) - 4, y + (height / 2) + 2, 8, 8 );
 		
 		if( hovered )
 		{
@@ -72,26 +82,31 @@ public class SpanRenderer extends ItemRenderer
 		return s.length() * 7;
 	}
 	
+	@Override
 	public int getHeight()
 	{	
 		return height;
 	}
 	
+	@Override
 	public boolean getPlaced()
 	{	
 		return placed;
 	}
 	
+	@Override
 	public int getWidth()
 	{	
 		return width;
 	}
 	
+	@Override
 	public int getX()
 	{
 		return x;
 	}
 
+	@Override
 	public int getY()
 	{
 		return y;

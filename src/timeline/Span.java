@@ -48,10 +48,29 @@ public class Span implements Item
 		rl.add( "Ended: " + end.toString() );
 		
 		String link = getData( "link" );
+		String loc = getData( "loc" );
 		String description = getData( "desc" );
 		if( link != null && !link.equals( "" ) )
 		{
 			rl.add( "Link: " + link );	
+		}
+		if( loc != null && !loc.equals( "" ) )
+		{
+			rl.add( "Location: " + loc );	
+		}
+		rl.add( "Priority: " + priority );
+		if( tags.size() > 0 )
+		{
+			String tagsText = "";
+			for( int i = 0; i < tags.size(); i++ )
+			{
+				tagsText += tags.get( i );
+				if( i < tags.size() - 1 )
+				{
+					tagsText += ", ";
+				}
+			}
+			rl.add( "Tags: " + tagsText );
 		}
 		if( description != null )
 		{

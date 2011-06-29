@@ -1,11 +1,8 @@
 package timeline;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -24,25 +21,34 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DGraphics;
 
-public class TimelineRun implements KeyListener, ComponentListener, ActionListener, MouseListener, MouseWheelListener, MouseMotionListener
+public class TimelineRun implements KeyListener, ComponentListener, ActionListener, MouseListener, MouseWheelListener, MouseMotionListener, ChangeListener
 {
 	Timeline timeline;
 	Graphics2DIRenderer r; 
@@ -51,6 +57,8 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 	public JMenuBar menubar;
 	public ImagePanel ip;
 	public RightClickMenu rcmenu;
+	public JSlider priority;
+	public JTextField tags;
 	
 	int lastX;
 	
@@ -146,9 +154,11 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		timelineMenu.add( editItemMenu );
 		
 		JToolBar toolbar = new JToolBar( "Timeline Control" );
+		toolbar.setFloatable( false );
+		toolbar.setFocusable( false );
 		container.getContentPane().add( toolbar, BorderLayout.SOUTH );
 		
-		JButton fastBack = new JButton( "Fast Back" );
+		JButton fastBack = new JButton( "RW" );
 		fastBack.setMargin( new Insets( 10, 10, 10, 10 ) );
 		fastBack.setActionCommand( "fastback" );
 		fastBack.addActionListener( this );
@@ -166,13 +176,39 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		forward.addActionListener( this );
 		toolbar.add( forward );
 		
-		JButton fastForward = new JButton( "Fast Forward" );
+		JButton fastForward = new JButton( "FF" );
 		fastForward.setMargin( new Insets( 10, 10, 10, 10 ) );
 		fastForward.setActionCommand( "fastforward" );
 		fastForward.addActionListener( this );
 		toolbar.add( fastForward );
 		
+		priority = new JSlider( 0, 100, 0 );
+		priority.setMajorTickSpacing( 10 );
+		priority.setMinorTickSpacing( 5 );
+		priority.setSnapToTicks( true );
+		priority.setPaintLabels( true );
+		priority.setPaintTicks( true );
+		priority.setToolTipText( "100 is the most important, 0 is the least." );
+		priority.addChangeListener( this );
+		JLabel priorityLabel = new JLabel( "Priority Threshold:" );
+		priorityLabel.setLabelFor( priority );
+		JPanel priorityPanel = new JPanel();
+		priorityPanel.add( priorityLabel, BorderLayout.WEST );
+		priorityPanel.add( priority, BorderLayout.EAST );
+		toolbar.add( priorityPanel );
 		
+		tags = new JTextField( 30 );
+		tags.setActionCommand( "tags" );
+		tags.addKeyListener( this );
+		tags.setToolTipText( "Tags are comma separated." );
+		JLabel tagsLabel = new JLabel( "Tags to Show:" );
+		tagsLabel.setLabelFor( tags );
+		JPanel tagsPanel = new JPanel();
+		tagsPanel.setMaximumSize( new Dimension( 250, 50 ) );
+		tagsPanel.setPreferredSize( new Dimension( 250, 50 ) );
+		tagsPanel.add( tagsLabel );
+		tagsPanel.add( tags );
+		toolbar.add( tagsPanel );
 		
 		ip = new ImagePanel( r.getImage() );
 		container.getContentPane().add( ip, BorderLayout.CENTER );
@@ -215,7 +251,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 
 	public void keyPressed( KeyEvent e ) 
 	{
-		if( timeline != null )
+		if( timeline != null && e.getSource() != tags )
 		{
 			switch( e.getKeyCode() )
 			{	
@@ -241,7 +277,19 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 
 	public void keyReleased( KeyEvent e ) 
 	{
-		
+		if( e.getSource() == tags )
+		{
+			ArrayList<String> tagsA = new ArrayList<String>();
+			String[] tagsS = tags.getText().split( "," );
+			for( int i = 0; i < tagsS.length; i++ )
+			{
+				String text = tagsS[i].trim();
+				if( text.length() > 0 )
+					tagsA.add( text );
+			}
+			timeline.tags = tagsA;
+			timelineChanged();
+		}
 	}
 
 	public void keyTyped( KeyEvent e ) 
@@ -259,7 +307,8 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 	    	this.image = (BufferedImage) image2;
 	    }
 
-	    public void paintComponent( Graphics g ) 
+	    @Override
+		public void paintComponent( Graphics g ) 
 	    {
 	        g.drawImage(image, 0, 0, null);
 	    }
@@ -508,6 +557,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		{
 			
 		}
+		container.requestFocus();
 	}
 
 	public void mouseEntered( MouseEvent e )
@@ -576,5 +626,11 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		timelineChanged();
 		
 		lastX = e.getX();
+	}
+
+	public void stateChanged( ChangeEvent e )
+	{
+		timeline.priority = priority.getValue();
+		timelineChanged();
 	}
 }

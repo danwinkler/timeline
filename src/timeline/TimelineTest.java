@@ -6,6 +6,7 @@ public class TimelineTest extends Graphics2DRenderer
 {
 	Timeline t;
 	
+	@Override
 	public void initialize() 
 	{
 		size( 800, 600 );
@@ -29,6 +30,7 @@ public class TimelineTest extends Graphics2DRenderer
 		t.add( new Span( "Bill Clinton's Presidency", new TDate( 1993, 1, 20 ), new TDate( 2001, 1, 20 ) ) );
 	}
 
+	@Override
 	public void update() 
 	{
 		t.update();

@@ -22,6 +22,7 @@ public class EventRenderer extends ItemRenderer
 		item = e;
 	}
 	
+	@Override
 	public void render( Renderer r, Item selected, Item hover ) 
 	{
 		boolean select = selected == e;
@@ -30,20 +31,29 @@ public class EventRenderer extends ItemRenderer
 			r.translate( x, y );
 			r.color( 255, 255, 255 );
 			r.fillRect( 0, 0, width, height );
+			r.color( (e.priority / 100.f) * 255, 0, ((100-e.priority) / 100.f) * 255 );
+			r.fillOval( width - 13, 15, 8, 8 );
 			r.color( select ? 255 : 0, 0, 0 );
 			r.text( e.name, 2, 11 );
 			r.text( e.date.toString(), 2, 23 );
 			r.drawRect( 0, 0, width, height );
 		r.popMatrix();
-		r.line( x, y, x, r.getHeight() - 100 );
+		if( hovered )
+		{
+			r.color( 128, 128, 128, 128 );
+			r.line( x+(width/2), y+height, x+(width/2), r.getHeight() - 100 );
+		}
 	}
 	
+	@Override
 	public void place( Timeline line )
 	{
 		y = 20;
 		width = makeWidth( line, line.r.getWidth() );
 		x = line.getDrawX( e.date );
+		x -= width/2;
 		height = 26;
+		
 		while( true )
 		{
 			boolean found = true;
@@ -76,31 +86,31 @@ public class EventRenderer extends ItemRenderer
 		return Math.max( fm.stringWidth( e.name ) + 5, fm.stringWidth( e.date.toString() ) + 5 );	
 	}
 	
-	private int strLen( String s )
-	{
-		return s.length() * 7;
-	}
-	
+	@Override
 	public int getHeight() 
 	{
 		return height;
 	}
 
+	@Override
 	public int getWidth() 
 	{
 		return width;
 	}
 
+	@Override
 	public int getX() 
 	{
 		return x;
 	}
 	
+	@Override
 	public int getY() 
 	{
 		return y;
 	}
 	
+	@Override
 	public boolean getPlaced()
 	{
 		return placed;

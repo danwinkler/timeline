@@ -1,5 +1,6 @@
 package timeline;
 
+import java.awt.RenderingHints;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +26,9 @@ public class Timeline
 	Item hover = null;
 	
 	File file = null;
+	
+	int priority = 0;
+	ArrayList<String> tags = new ArrayList<String>();
 	
 	public Timeline( Renderer r )
 	{
@@ -81,17 +85,39 @@ public class Timeline
 	
 	public void render()
 	{
+		((Graphics2DIRenderer)r).g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 		int width = r.getWidth();
 		int height = r.getHeight();
 		r.color( 255, 255, 255 );
 		r.fillRect( 0, 0, width, height );
 		
-		for( int i = 0; i < visible.size(); i++ )
+		int tempPriority = priority;
+		while( tempPriority < 100 )
 		{
-			ItemRenderer e = visible.get( i );
-			if( !e.getPlaced() )
+			for( int i = 0; i < visible.size(); i++ )
 			{
-				e.place( this );
+				ItemRenderer e = visible.get( i );
+				if( !e.getPlaced() )
+				{
+					e.place( this );
+				}
+			}
+			
+			if( belowHeight( height - 120 ) )
+			{
+				tempPriority += 5;
+				for( int i = 0; i < visible.size(); i++ )
+				{
+					if( visible.get( i ).item.getPriority() < tempPriority )
+					{
+						visible.remove( i );
+						i--;
+					}
+				}
+			}
+			else
+			{
+				break;
 			}
 		}
 		Collections.sort( visible );
@@ -115,6 +141,19 @@ public class Timeline
 			r.popMatrix();
 			
 		}
+	}
+	
+	private boolean belowHeight( int height )
+	{
+		for( int i = 0; i < visible.size(); i++ )
+		{
+			ItemRenderer r = visible.get( i );
+			if( r.getY() + r.getHeight() > height )
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void drawDateLine( Renderer r, int width, int height ) 
@@ -147,6 +186,24 @@ public class Timeline
 			r.popMatrix();
 		}
 	}
+	
+	public boolean isTagged( Item it )
+	{
+		if( tags.size() == 0 )
+			return true;
+		ArrayList<String> itags = it.getTags();
+		for( int i = 0; i < itags.size(); i++ )
+		{
+			for( int j = 0; j < tags.size(); j++ )
+			{
+				if( itags.get( i ).toLowerCase().equals( tags.get( j ).toLowerCase() ) )
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	public int getDrawX( TDate d )
 	{
@@ -175,7 +232,7 @@ public class Timeline
 		for( int i = 0; i < items.size(); i++ )
 		{
 			Item item = items.get( i );
-			if( item.isVisible( centerDate, zoom ) )
+			if( item.isVisible( centerDate, zoom ) && item.getPriority() >= priority && isTagged( item ) )
 			{
 				visible.add( createRenderer( item ) );
 			}
@@ -235,7 +292,7 @@ public class Timeline
         while(start < chars.length-1) {
             int charCount = 0;
             int lastSpace = 0;
-            while(charCount < charLimit) {
+            while( charCount < charLimit ) {
                 if(chars[charCount+start] == ' ') {
                     lastSpace = charCount;
                 }

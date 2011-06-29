@@ -1,7 +1,6 @@
 package timeline;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class TDate implements Serializable
 {
@@ -42,6 +41,7 @@ public class TDate implements Serializable
 		return ((year-d.year)*12) + (month-d.month) + ((day-d.day)*(1.f/30.f));
 	}
 	
+	@Override
 	public String toString()
 	{
 		String str = String.valueOf( year );

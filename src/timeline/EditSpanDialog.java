@@ -2,10 +2,10 @@ package timeline;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
@@ -41,6 +42,8 @@ public class EditSpanDialog implements ActionListener
 	JTextField link;
 	JTextField location;
 	JTextArea description;
+	JSlider priority;
+	JTextField tags;
 	JButton submit;
 	JButton cancel;
 	
@@ -187,12 +190,37 @@ public class EditSpanDialog implements ActionListener
 		locationPanel.add( location, BorderLayout.EAST );
 		dialog.getContentPane().add( locationPanel );
 		
+		tags = new JTextField( 50 );
+		tags.setToolTipText( "Tags are comma separated." );
+		JLabel tagsLabel = new JLabel( "Tags:" );
+		tagsLabel.setLabelFor( tags );
+		JPanel tagsPanel = new JPanel();
+		tagsPanel.add( tagsLabel, BorderLayout.WEST );
+		tagsPanel.add( tags, BorderLayout.EAST );
+		dialog.getContentPane().add( tagsPanel );
+		
+		priority = new JSlider( 0, 100 );
+		priority.setMajorTickSpacing( 10 );
+		priority.setMinorTickSpacing( 5 );
+		priority.setSnapToTicks( true );
+		priority.setPaintLabels( true );
+		priority.setPaintTicks( true );
+		priority.setToolTipText( "100 is the most important, 0 is the least." );
+		JLabel priorityLabel = new JLabel( "Priority:" );
+		priorityLabel.setLabelFor( priority );
+		JPanel priorityPanel = new JPanel();
+		priorityPanel.add( priorityLabel, BorderLayout.WEST );
+		priorityPanel.add( priority, BorderLayout.EAST );
+		dialog.getContentPane().add( priorityPanel );
+		
 		description = new JTextArea( 20, 5 );
 		description.setLineWrap( true );
 		description.setWrapStyleWord( true );
 		JScrollPane descScroll = new JScrollPane( description );
+		descScroll.setMaximumSize( new Dimension( 400, 150 ) );
 		descScroll.setBounds( 0, 0, 400, 100 );
 		descScroll.setVerticalScrollBarPolicy( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+		descScroll.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
 		JLabel descLabel = new JLabel( "Description:" );
 		descLabel.setLabelFor( descScroll );
 		JPanel descPanel = new JPanel();
@@ -241,6 +269,19 @@ public class EditSpanDialog implements ActionListener
 			link.setText( edit.getData( "link" ) );
 			location.setText( edit.getData( "loc" ) );
 			description.setText( edit.getData( "desc" ) );
+			
+			priority.setValue( edit.priority );
+			String tagText = "";
+			for( int i = 0; i < edit.tags.size(); i++ )
+			{
+				tagText += edit.tags.get( i );
+				
+				if( i < edit.tags.size() - 1 )
+				{
+					tagText += ",";
+				}
+			}
+			tags.setText( tagText );
 		}
 		else if( year != null )
 		{
@@ -302,12 +343,21 @@ public class EditSpanDialog implements ActionListener
 				TDate startDate = new TDate( iyear, imonth, iday, ihour, iminute, isecond );
 				TDate endDate = new TDate( ifyear, ifmonth, ifday, ifhour, ifminute, ifsecond );
 				
+				String[] sTags = tags.getText().split(",");
+				ArrayList<String> aTags = new ArrayList<String>();
+				for( int i = 0; i < sTags.length; i++ )
+				{
+					aTags.add( sTags[i].trim() );
+				}
+				
 				if( edit == null )
 				{
 					Span span = new Span( etext, startDate, endDate );
 					span.setData( "link", link.getText().trim() );
 					span.setData( "loc", location.getText().trim() );
 					span.setData( "desc", description.getText().trim() );
+					span.priority = priority.getValue();
+					span.tags = aTags;
 					callback.dialogCompleted( span, true );
 				}
 				else
@@ -318,6 +368,8 @@ public class EditSpanDialog implements ActionListener
 					edit.setData( "link", link.getText().trim() );
 					edit.setData( "loc", location.getText().trim() );
 					edit.setData( "desc", description.getText().trim() );
+					edit.priority = priority.getValue();
+					edit.tags = aTags;
 					callback.dialogCompleted( edit, false );
 				}
 			}

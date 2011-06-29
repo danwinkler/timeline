@@ -39,14 +39,14 @@ public class RightClickMenu implements ActionListener
 			edit.addActionListener( this );
 			popup.add( edit );
 			
-			if( !i.getData( "link" ).equals( "" ) )
+			if( i.getData( "link" ) != null && !i.getData( "link" ).equals( "" ) )
 			{
 				JMenuItem link = new JMenuItem( "Visit Link" );
 				link.setActionCommand( "link" );
 				link.addActionListener( this );
 				popup.add( link );
 			}
-			if( !i.getData( "loc" ).equals( "" ) )
+			if( i.getData( "loc" ) != null && !i.getData( "loc" ).equals( "" ) )
 			{
 				JMenuItem loc = new JMenuItem( "View on Map" );
 				loc.setActionCommand( "loc" );
