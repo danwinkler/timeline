@@ -11,6 +11,9 @@ import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -25,6 +28,9 @@ public class PreferencesDialog implements ActionListener, MouseListener
 	ColorDisplayer fillColor;
 	ColorDisplayer backgroundColor;
 	ColorDisplayer selectColor;
+	JSpinner boxMargins;
+	JSlider lineThickness;
+	JSlider cornerRadius;
 	
 	JButton submit;
 	JButton cancel;
@@ -35,8 +41,8 @@ public class PreferencesDialog implements ActionListener, MouseListener
 		this.prefs = prefs;
 		
 		dialog = new JDialog( frame, "Settings" );
-		dialog.setPreferredSize( new Dimension( 200, 200 ) );
-		dialog.setSize( 200, 200 );
+		dialog.setPreferredSize( new Dimension( 250, 350 ) );
+		dialog.setSize( 250, 350 );
 		dialog.setResizable( false );
 		
 		//dialog.getContentPane().setLayout( new BoxLayout( dialog.getContentPane(), BoxLayout.PAGE_AXIS ) );
@@ -75,7 +81,33 @@ public class PreferencesDialog implements ActionListener, MouseListener
 		JLabel selectColorLabel = new JLabel( "Selection Color:" );
 		selectColorLabel.setLabelFor( selectColor );
 		dialog.getContentPane().add( selectColorLabel, "align right" );
-		dialog.getContentPane().add( selectColor, "align left, wrap" );
+		dialog.getContentPane().add( selectColor, "align left, wrap 5px" );
+		
+		boxMargins = new JSpinner( new SpinnerNumberModel( 5, 0, 20, 1 ) );
+		JLabel boxMarginsLabel = new JLabel( "Box Padding:" );
+		boxMarginsLabel.setLabelFor( boxMargins );
+		dialog.getContentPane().add( boxMarginsLabel, "align right" );
+		dialog.getContentPane().add( boxMargins, "align left, wrap 15px" );
+		
+		lineThickness = new JSlider( 0, 50, 20 );
+		lineThickness.setMajorTickSpacing( 10 );
+		lineThickness.setMinorTickSpacing( 5 );
+		lineThickness.setPaintTicks( true );
+		JLabel lineThicknessLabel = new JLabel( "Line Thickness:" );
+		lineThicknessLabel.setLabelFor( lineThickness );
+		dialog.getContentPane().add( lineThicknessLabel, "align center, wrap, span" );
+		dialog.getContentPane().add( lineThickness, "align center, wrap 15px, span" );
+		
+		cornerRadius = new JSlider( 0, 20, 10 );
+		cornerRadius.setMajorTickSpacing( 5 );
+		cornerRadius.setMinorTickSpacing( 1 );
+		cornerRadius.setSnapToTicks( true );
+		cornerRadius.setPaintLabels( true );
+		cornerRadius.setPaintTicks( true );
+		JLabel cornerRadiusLabel = new JLabel( "Corner Radius:" );
+		cornerRadiusLabel.setLabelFor( cornerRadius );
+		dialog.getContentPane().add( cornerRadiusLabel, "align center, wrap, span" );
+		dialog.getContentPane().add( cornerRadius, "align center, wrap 15px, span" );
 		
 		submit = new JButton( "Finish" );
 		submit.addActionListener( this );
@@ -97,6 +129,9 @@ public class PreferencesDialog implements ActionListener, MouseListener
 		fillColor.setColor( prefs.fillColor );
 		backgroundColor.setColor( prefs.backgroundColor );
 		selectColor.setColor( prefs.selectColor );
+		boxMargins.setValue( prefs.boxMargins );
+		lineThickness.setValue( (int)(prefs.lineThickness * 10) );
+		cornerRadius.setValue( (int)prefs.cornerRadius );
 		
 		dialog.setVisible( true );
 	}
@@ -111,6 +146,9 @@ public class PreferencesDialog implements ActionListener, MouseListener
 			prefs.fillColor = fillColor.color;
 			prefs.backgroundColor = backgroundColor.color;
 			prefs.selectColor = selectColor.color;
+			prefs.lineThickness = lineThickness.getValue() / 10.f;
+			prefs.cornerRadius = cornerRadius.getValue();
+			prefs.boxMargins = (Integer) boxMargins.getValue();
 		}
 		dialog.setVisible( false );
 		dialog.dispose();
