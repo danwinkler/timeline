@@ -3,6 +3,9 @@ package timeline;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import com.phyloa.timeline.TimelinePreferences;
+
+
 public class TimelineData implements Serializable
 {
 	/**
@@ -10,7 +13,8 @@ public class TimelineData implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	TDate centerDate = new TDate();
-	float zoom = 12;
-	ArrayList<Item> items = new ArrayList<Item>();
+	public TDate centerDate = new TDate();
+	public float zoom = 12;
+	public ArrayList<Item> items = new ArrayList<Item>();
+	public TimelinePreferences tp;
 }

@@ -1,10 +1,9 @@
-package timeline;
+package com.phyloa.timeline;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,8 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,11 +35,15 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import net.miginfocom.swing.MigLayout;
+import timeline.Event;
+import timeline.Item;
+import timeline.Span;
+import timeline.TimelineData;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.util.DFile;
@@ -153,11 +154,20 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		editItemMenu.addActionListener( this );
 		timelineMenu.add( editItemMenu );
 		
+		timelineMenu.addSeparator();
+		
+		JMenuItem settingsMenu = new JMenuItem( "Settings", 'S' );
+		settingsMenu.setActionCommand( "settings" );
+		settingsMenu.addActionListener( this );
+		timelineMenu.add( settingsMenu );
+		
 		JToolBar toolbar = new JToolBar( "Timeline Control" );
 		toolbar.setFloatable( false );
 		toolbar.setFocusable( false );
+		toolbar.setLayout( new MigLayout( "align center center" ) );
 		container.getContentPane().add( toolbar, BorderLayout.SOUTH );
 		
+		/*
 		JButton fastBack = new JButton( "RW" );
 		fastBack.setMargin( new Insets( 10, 10, 10, 10 ) );
 		fastBack.setActionCommand( "fastback" );
@@ -181,6 +191,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		fastForward.setActionCommand( "fastforward" );
 		fastForward.addActionListener( this );
 		toolbar.add( fastForward );
+		*/
 		
 		priority = new JSlider( 0, 100, 0 );
 		priority.setMajorTickSpacing( 10 );
@@ -246,6 +257,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 	
 	public static void main( String[] args )
 	{
+		@SuppressWarnings("unused")
 		TimelineRun tr = new TimelineRun();
 	}
 
@@ -384,6 +396,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 					timeline.items = dat.items;
 					timeline.zoom = dat.zoom;
 					timeline.file = f;
+					timeline.tp = dat.tp == null ? new TimelinePreferences() : dat.tp;
 					timelineChanged();
 				}
 			}
@@ -394,6 +407,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 			dat.centerDate = timeline.centerDate;
 			dat.items = timeline.items;
 			dat.zoom = timeline.zoom;
+			dat.tp = timeline.tp;
 			if( timeline.file == null )
 			{
 				final JFileChooser fc = new JFileChooser();
@@ -409,6 +423,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 							filename = filename + ".timeline";
 						}
 						DFile.saveObject( filename, dat );
+						timeline.file = f;
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -435,6 +450,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 				dat.centerDate = timeline.centerDate;
 				dat.items = timeline.items;
 				dat.zoom = timeline.zoom;
+				dat.tp = timeline.tp;
 				try {
 					String filename = f.getAbsolutePath();
 					if( !filename.endsWith( ".timeline" ) )
@@ -442,6 +458,7 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 						filename = filename + ".timeline";
 					}
 					DFile.saveObject( filename, dat );
+					timeline.file = f;
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -461,6 +478,11 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 			{
 				editItem( timeline.selected );
 			}
+		}
+		else if( e.getActionCommand().equals( "settings" ) )
+		{
+			PreferencesDialog pd = new PreferencesDialog( container, timeline.tp );
+			pd.showDialog();
 		}
 		else if( e.getActionCommand().equals( "exporttext" ) )
 		{

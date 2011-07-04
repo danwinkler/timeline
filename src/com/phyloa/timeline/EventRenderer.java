@@ -1,6 +1,10 @@
-package timeline;
+package com.phyloa.timeline;
 
+import java.awt.BasicStroke;
 import java.awt.FontMetrics;
+
+import timeline.Event;
+import timeline.Item;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Renderer;
@@ -23,20 +27,31 @@ public class EventRenderer extends ItemRenderer
 	}
 	
 	@Override
-	public void render( Renderer r, Item selected, Item hover ) 
+	public void render( Renderer r, Item selected, Item hover, TimelinePreferences tp ) 
 	{
+		((Graphics2DIRenderer)r).g.setStroke( new BasicStroke( tp.lineThickness ) );
 		boolean select = selected == e;
 		boolean hovered = hover == e;
 		r.pushMatrix();
 			r.translate( x, y );
-			r.color( 255, 255, 255 );
-			r.fillRect( 0, 0, width, height );
+			r.color( tp.fillColor );
+			if( tp.roundedCorners ) 
+				r.fillRoundedRect( 0, 0, width, height, tp.cornerRadius, tp.cornerRadius ); 
+			else 
+				r.fillRect( 0, 0, width, height );
 			r.color( (e.priority / 100.f) * 255, 0, ((100-e.priority) / 100.f) * 255 );
-			r.fillOval( width - 13, 15, 8, 8 );
-			r.color( select ? 255 : 0, 0, 0 );
-			r.text( e.name, 2, 11 );
-			r.text( e.date.toString(), 2, 23 );
-			r.drawRect( 0, 0, width, height );
+			r.fillOval( width - 5 - tp.boxMargins - tp.lineThickness, height - 5 - tp.boxMargins - tp.lineThickness, 8, 8 );
+			r.color( select ? tp.selectColor : tp.textColor );
+			r.pushMatrix();
+				r.translate( tp.boxMargins, tp.boxMargins );
+				r.text( e.name, 2, 11 );
+				r.text( e.date.toString(), 2, 23 );
+			r.popMatrix();
+			r.color( select ? tp.selectColor : tp.lineColor );
+			if( tp.roundedCorners ) 
+				r.drawRoundedRect( 0, 0, width, height, tp.cornerRadius, tp.cornerRadius ); 
+			else 
+				r.drawRect( 0, 0, width, height );
 		r.popMatrix();
 		if( hovered )
 		{
@@ -46,13 +61,13 @@ public class EventRenderer extends ItemRenderer
 	}
 	
 	@Override
-	public void place( Timeline line )
+	public void place( Timeline line, TimelinePreferences tp )
 	{
 		y = 20;
-		width = makeWidth( line, line.r.getWidth() );
+		width = makeWidth( line, line.r.getWidth() ) + (tp.boxMargins * 2);
 		x = line.getDrawX( e.date );
 		x -= width/2;
-		height = 26;
+		height = 26 + (tp.boxMargins * 2);
 		
 		while( true )
 		{

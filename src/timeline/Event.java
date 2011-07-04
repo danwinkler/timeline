@@ -3,8 +3,9 @@ package timeline;
 import java.util.ArrayList;
 
 import com.phyloa.dlib.renderer.Renderer;
+import com.phyloa.timeline.RenderLines;
+import com.phyloa.timeline.Timeline;
 
-import timeline.TDate;
 
 public class Event implements Item
 {
@@ -12,11 +13,11 @@ public class Event implements Item
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	String name;
-	TDate date = new TDate();
-	ArrayList<String> tags = new ArrayList<String>();
-	ArrayList<DoubleString> data = new ArrayList<DoubleString>();
-	int priority;
+	public String name;
+	public TDate date = new TDate();
+	public ArrayList<String> tags = new ArrayList<String>();
+	public ArrayList<DoubleString> data = new ArrayList<DoubleString>();
+	public int priority;
 	
 	public Event( String name )
 	{

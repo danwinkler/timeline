@@ -1,9 +1,15 @@
-package timeline;
+package com.phyloa.timeline;
 
+import java.awt.BasicStroke;
 import java.awt.RenderingHints;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import timeline.Event;
+import timeline.Item;
+import timeline.Span;
+import timeline.TDate;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Renderer;
@@ -29,6 +35,8 @@ public class Timeline
 	
 	int priority = 0;
 	ArrayList<String> tags = new ArrayList<String>();
+	
+	TimelinePreferences tp = new TimelinePreferences();
 	
 	public Timeline( Renderer r )
 	{
@@ -88,7 +96,7 @@ public class Timeline
 		((Graphics2DIRenderer)r).g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 		int width = r.getWidth();
 		int height = r.getHeight();
-		r.color( 255, 255, 255 );
+		r.color( tp.backgroundColor );
 		r.fillRect( 0, 0, width, height );
 		
 		int tempPriority = priority;
@@ -99,7 +107,7 @@ public class Timeline
 				ItemRenderer e = visible.get( i );
 				if( !e.getPlaced() )
 				{
-					e.place( this );
+					e.place( this, tp );
 				}
 			}
 			
@@ -124,7 +132,7 @@ public class Timeline
 		for( int i = 0; i < visible.size(); i++ )
 		{
 			ItemRenderer e = visible.get( i );
-			e.render( r, selected, hover );
+			e.render( r, selected, hover, tp );
 		}
 		drawDateLine( r, width, height );
 		
@@ -158,8 +166,9 @@ public class Timeline
 	
 	private void drawDateLine( Renderer r, int width, int height ) 
 	{
-		r.color( 0, 0, 0 );
+		r.color( tp.lineColor );
 		//DRAW a base line
+		((Graphics2DIRenderer)r).g.setStroke( new BasicStroke( tp.lineThickness ) );
 		r.line( 0, height - 100, width, height - 100 );
 		//FIND distance between years in pixels
 		float yearSeparation = width / (zoom/12.f);
@@ -181,7 +190,9 @@ public class Timeline
 			r.pushMatrix();
 			r.translate( firstDrawX + yearSeparation*(i-firstYear), height-100 );
 			r.rotate( (float)Math.PI/2 );
+			r.color( tp.lineColor );
 			r.line( 0, 0, -20, 0 );
+			r.color( tp.textColor );
 			r.text( i + "", 3, 4 );
 			r.popMatrix();
 		}
@@ -216,8 +227,8 @@ public class Timeline
 	
 	public int getYearFromMouse( int x )
 	{
-		int width = r.getWidth();
-		int diff = x - width;
+		//int width = r.getWidth();
+		//int diff = x - width;
 		return 0;
 	}
 
@@ -267,6 +278,7 @@ public class Timeline
 		visible.clear();
 		zoom = 25*12;
 		centerDate = new TDate();
+		tp = new TimelinePreferences();
 	}
 
 	public Item getItem( int x, int y ) 

@@ -1,4 +1,4 @@
-package timeline;
+package com.phyloa.timeline;
 
 import java.util.ArrayList;
 

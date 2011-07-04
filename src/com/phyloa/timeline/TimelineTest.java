@@ -1,4 +1,8 @@
-package timeline;
+package com.phyloa.timeline;
+
+import timeline.Event;
+import timeline.Span;
+import timeline.TDate;
 
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
 

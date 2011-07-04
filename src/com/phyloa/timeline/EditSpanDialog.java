@@ -1,23 +1,25 @@
-package timeline;
+package com.phyloa.timeline;
 
-import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Vector;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
+import net.miginfocom.swing.MigLayout;
+import timeline.Span;
+import timeline.TDate;
 
 public class EditSpanDialog implements ActionListener
 {
@@ -54,150 +56,107 @@ public class EditSpanDialog implements ActionListener
 		this.callback = callback;
 		
 		dialog = new JDialog( frame, "Edit Span" );
-		dialog.setPreferredSize( new Dimension( 520, 550 ) );
-		dialog.setSize( 520, 450 );
+		dialog.setPreferredSize( new Dimension( 400, 550 ) );
+		dialog.setSize( 400, 450 );
 		
-		dialog.getContentPane().setLayout( new BoxLayout( dialog.getContentPane(), BoxLayout.PAGE_AXIS ) );
+		dialog.getContentPane().setLayout( new MigLayout( "align center center" ) );
 		
-		stext = new JTextField( 50 );
+		stext = new JTextField();
 		JLabel textLabel = new JLabel( "Name of Event:" );
 		textLabel.setLabelFor( stext );
-		JPanel textPanel = new JPanel();
-		textPanel.add( textLabel, BorderLayout.WEST );
-		textPanel.add( stext, BorderLayout.EAST );
-		dialog.getContentPane().add( textPanel );
-		
-		JPanel datePanel = new JPanel( new GridLayout( 0, 2 ) );
-		
-		JPanel startDatePanel = new JPanel( new GridLayout( 0, 1 ) );
+		dialog.getContentPane().add( textLabel, "align right" );
+		dialog.getContentPane().add( stext, "align left, span 3, wrap 10px, growx" );
 		
 		syear = new JTextField( 9 );
 		JLabel yearLabel = new JLabel( "Start Year:" );
 		yearLabel.setLabelFor( syear );
-		JPanel yearPanel = new JPanel();
-		yearPanel.add( yearLabel );
-		yearPanel.add( syear );
-		startDatePanel.add( yearPanel );
-		
-		smonth = new JTextField( 9 );
-		JLabel monthLabel = new JLabel( "Start Month:" );
-		monthLabel.setLabelFor( smonth );
-		JPanel monthPanel = new JPanel();
-		monthPanel.add( monthLabel, BorderLayout.WEST );
-		monthPanel.add( smonth, BorderLayout.EAST );
-		startDatePanel.add( monthPanel );
-		
-		sday = new JTextField( 9 );
-		JLabel dayLabel = new JLabel( "Start Day:" );
-		dayLabel.setLabelFor( sday );
-		JPanel dayPanel = new JPanel();
-		dayPanel.add( dayLabel, BorderLayout.WEST );
-		dayPanel.add( sday, BorderLayout.EAST );
-		startDatePanel.add( dayPanel );
-		
-		shour = new JTextField( 9 );
-		JLabel hourLabel = new JLabel( "Start Hour:" );
-		hourLabel.setLabelFor( shour );
-		JPanel hourPanel = new JPanel();
-		hourPanel.add( hourLabel, BorderLayout.WEST );
-		hourPanel.add( shour, BorderLayout.EAST );
-		startDatePanel.add( hourPanel );
-		
-		sminute = new JTextField( 9 );
-		JLabel minuteLabel = new JLabel( "Start Minute:" );
-		minuteLabel.setLabelFor( sminute );
-		JPanel minutePanel = new JPanel();
-		minutePanel.add( minuteLabel, BorderLayout.WEST );
-		minutePanel.add( sminute, BorderLayout.EAST );
-		startDatePanel.add( minutePanel );
-		
-		ssecond = new JTextField( 9 );
-		JLabel secondLabel = new JLabel( "Start Second:" );
-		secondLabel.setLabelFor( ssecond );
-		JPanel secondPanel = new JPanel();
-		secondPanel.add( secondLabel, BorderLayout.WEST );
-		secondPanel.add( ssecond, BorderLayout.EAST );
-		startDatePanel.add( secondPanel );
-		
-		datePanel.add( startDatePanel );
-		JPanel endDatePanel = new JPanel( new GridLayout( 0, 1 ) );
+		dialog.getContentPane().add( yearLabel, "align right" );
+		dialog.getContentPane().add( syear, "align left" );
 		
 		fyear = new JTextField( 9 );
 		JLabel fyearLabel = new JLabel( "End Year:" );
 		fyearLabel.setLabelFor( syear );
-		JPanel fyearPanel = new JPanel();
-		fyearPanel.add( fyearLabel, BorderLayout.WEST );
-		fyearPanel.add( fyear, BorderLayout.EAST );
-		endDatePanel.add( fyearPanel );
+		dialog.getContentPane().add( fyearLabel, "align right" );
+		dialog.getContentPane().add( fyear, "align left, wrap" );
 		
+		smonth = new JTextField( 9 );
+		JLabel monthLabel = new JLabel( "Start Month:" );
+		monthLabel.setLabelFor( smonth );
+		dialog.getContentPane().add( monthLabel, "align right" );
+		dialog.getContentPane().add( smonth, "align left" );
+
 		fmonth = new JTextField( 9 );
 		JLabel fmonthLabel = new JLabel( "End Month:" );
 		fmonthLabel.setLabelFor( fmonth );
-		JPanel fmonthPanel = new JPanel();
-		fmonthPanel.add( fmonthLabel, BorderLayout.WEST );
-		fmonthPanel.add( fmonth, BorderLayout.EAST );
-		endDatePanel.add( fmonthPanel );
+		dialog.getContentPane().add( fmonthLabel, "align right" );
+		dialog.getContentPane().add( fmonth, "align left, wrap" );
 		
+		sday = new JTextField( 9 );
+		JLabel dayLabel = new JLabel( "Start Day:" );
+		dayLabel.setLabelFor( sday );
+		dialog.getContentPane().add( dayLabel, "align right" );
+		dialog.getContentPane().add( sday, "align left" );
+
 		fday = new JTextField( 9 );
 		JLabel fdayLabel = new JLabel( "End Day:" );
 		fdayLabel.setLabelFor( fday );
-		JPanel fdayPanel = new JPanel();
-		fdayPanel.add( fdayLabel, BorderLayout.WEST );
-		fdayPanel.add( fday, BorderLayout.EAST );
-		endDatePanel.add( fdayPanel );
+		dialog.getContentPane().add( fdayLabel, "align right" );
+		dialog.getContentPane().add( fday, "align left, wrap" );
 		
+		shour = new JTextField( 9 );
+		JLabel hourLabel = new JLabel( "Start Hour:" );
+		hourLabel.setLabelFor( shour );
+		dialog.getContentPane().add( hourLabel, "align right" );
+		dialog.getContentPane().add( shour, "align left" );
+
 		fhour = new JTextField( 9 );
 		JLabel fhourLabel = new JLabel( "End Hour:" );
 		fhourLabel.setLabelFor( fhour );
-		JPanel fhourPanel = new JPanel();
-		fhourPanel.add( fhourLabel, BorderLayout.WEST );
-		fhourPanel.add( fhour, BorderLayout.EAST );
-		endDatePanel.add( fhourPanel );
+		dialog.getContentPane().add( fhourLabel, "align right" );
+		dialog.getContentPane().add( fhour, "align left, wrap" );
 		
+		sminute = new JTextField( 9 );
+		JLabel minuteLabel = new JLabel( "Start Minute:" );
+		minuteLabel.setLabelFor( sminute );
+		dialog.getContentPane().add( minuteLabel, "align right" );
+		dialog.getContentPane().add( sminute, "align left" );
+
 		fminute = new JTextField( 9 );
 		JLabel fminuteLabel = new JLabel( "End Minute:" );
 		fminuteLabel.setLabelFor( fminute );
-		JPanel fminutePanel = new JPanel();
-		fminutePanel.add( fminuteLabel, BorderLayout.WEST );
-		fminutePanel.add( fminute, BorderLayout.EAST );
-		endDatePanel.add( fminutePanel );
+		dialog.getContentPane().add( fminuteLabel, "align right" );
+		dialog.getContentPane().add( fminute, "align left, wrap" );
 		
+		ssecond = new JTextField( 9 );
+		JLabel secondLabel = new JLabel( "Start Second:" );
+		secondLabel.setLabelFor( ssecond );
+		dialog.getContentPane().add( secondLabel, "align right" );
+		dialog.getContentPane().add( ssecond, "align left" );
+
 		fsecond = new JTextField( 9 );
 		JLabel fsecondLabel = new JLabel( "End Second:" );
 		fsecondLabel.setLabelFor( fsecond );
-		JPanel fsecondPanel = new JPanel();
-		fsecondPanel.add( fsecondLabel, BorderLayout.WEST );
-		fsecondPanel.add( fsecond, BorderLayout.EAST );
-		endDatePanel.add( fsecondPanel );
+		dialog.getContentPane().add( fsecondLabel, "align right" );
+		dialog.getContentPane().add( fsecond, "align left, wrap 10px" );
 		
-		datePanel.add( endDatePanel );
-		
-		dialog.getContentPane().add( datePanel );
-		
-		link = new JTextField( 50 );
+		link = new JTextField();
 		JLabel linkLabel = new JLabel( "Link:" );
 		linkLabel.setLabelFor( link );
-		JPanel linkPanel = new JPanel();
-		linkPanel.add( linkLabel, BorderLayout.WEST );
-		linkPanel.add( link, BorderLayout.EAST );
-		dialog.getContentPane().add( linkPanel );
+		dialog.getContentPane().add( linkLabel, "align right" );
+		dialog.getContentPane().add( link, "align left, wrap, span 3, growx" );
 		
-		location = new JTextField( 50 );
+		location = new JTextField();
 		JLabel locationLabel = new JLabel( "Location:" );
 		locationLabel.setLabelFor( location );
-		JPanel locationPanel = new JPanel();
-		locationPanel.add( locationLabel, BorderLayout.WEST );
-		locationPanel.add( location, BorderLayout.EAST );
-		dialog.getContentPane().add( locationPanel );
+		dialog.getContentPane().add( locationLabel, "align right" );
+		dialog.getContentPane().add( location, "align left, wrap, span 3, growx" );
 		
-		tags = new JTextField( 50 );
+		tags = new JTextField();
 		tags.setToolTipText( "Tags are comma separated." );
 		JLabel tagsLabel = new JLabel( "Tags:" );
 		tagsLabel.setLabelFor( tags );
-		JPanel tagsPanel = new JPanel();
-		tagsPanel.add( tagsLabel, BorderLayout.WEST );
-		tagsPanel.add( tags, BorderLayout.EAST );
-		dialog.getContentPane().add( tagsPanel );
+		dialog.getContentPane().add( tagsLabel, "align right" );
+		dialog.getContentPane().add( tags, "align left, wrap 15px, span 3, growx" );
 		
 		priority = new JSlider( 0, 100 );
 		priority.setMajorTickSpacing( 10 );
@@ -208,10 +167,8 @@ public class EditSpanDialog implements ActionListener
 		priority.setToolTipText( "100 is the most important, 0 is the least." );
 		JLabel priorityLabel = new JLabel( "Priority:" );
 		priorityLabel.setLabelFor( priority );
-		JPanel priorityPanel = new JPanel();
-		priorityPanel.add( priorityLabel, BorderLayout.WEST );
-		priorityPanel.add( priority, BorderLayout.EAST );
-		dialog.getContentPane().add( priorityPanel );
+		dialog.getContentPane().add( priorityLabel, "align center, wrap, span" );
+		dialog.getContentPane().add( priority, "align center, wrap 15px, span" );
 		
 		description = new JTextArea( 20, 5 );
 		description.setLineWrap( true );
@@ -223,24 +180,43 @@ public class EditSpanDialog implements ActionListener
 		descScroll.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
 		JLabel descLabel = new JLabel( "Description:" );
 		descLabel.setLabelFor( descScroll );
-		JPanel descPanel = new JPanel();
-		descPanel.setLayout( new BoxLayout( descPanel, BoxLayout.LINE_AXIS ) );
-		descPanel.add( descLabel );
-		descPanel.add( descScroll );
-		dialog.getContentPane().add( descPanel );
+		dialog.getContentPane().add( descLabel, "span 4, wrap, align center" );
+		dialog.getContentPane().add( descScroll, "span 4, wrap, align center, growx" );
 		
-		JPanel buttonPanel = new JPanel();
 		submit = new JButton( "Submit" );
 		submit.addActionListener( this );
 		submit.setActionCommand( "submit" );
-		buttonPanel.add( submit );
+		dialog.getContentPane().add( submit, "span 2, align right" );
 		
 		cancel = new JButton( "Cancel" );
 		cancel.addActionListener( this );
 		cancel.setActionCommand( "cancel" );
-		dialog.getContentPane().add( cancel );
-		buttonPanel.add( cancel );
-		dialog.getContentPane().add( buttonPanel );
+		dialog.getContentPane().add( cancel, "span 2, align left" );
+		
+		dialog.getContentPane().setFocusCycleRoot( true );
+		Vector<Component> co = new Vector<Component>();
+		co.add( stext );
+		co.add( syear );
+		co.add( fyear );
+		co.add( smonth );
+		co.add( fmonth );
+		co.add( sday );
+		co.add( fday );
+		co.add( shour );
+		co.add( fhour );
+		co.add( sminute );
+		co.add( fminute );
+		co.add( ssecond );
+		co.add( fsecond );
+		co.add( link );
+		co.add( location );
+		co.add( tags );
+		co.add( priority );
+		co.add( description );
+		co.add( submit );
+		co.add( cancel );
+		MyOwnFocusTraversalPolicy tp = new MyOwnFocusTraversalPolicy( co );
+		dialog.getContentPane().setFocusTraversalPolicy( tp );
 		
 		dialog.pack();
 	}

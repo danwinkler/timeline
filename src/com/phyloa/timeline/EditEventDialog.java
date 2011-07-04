@@ -1,22 +1,23 @@
-package timeline;
+package com.phyloa.timeline;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
+import net.miginfocom.swing.MigLayout;
+import timeline.Event;
+import timeline.TDate;
 
 public class EditEventDialog implements ActionListener
 {
@@ -46,92 +47,72 @@ public class EditEventDialog implements ActionListener
 		this.callback = callback;
 		
 		dialog = new JDialog( frame, "Edit Event" );
-		dialog.setPreferredSize( new Dimension( 520, 550 ) );
-		dialog.setSize( 520, 550 );
+		dialog.setPreferredSize( new Dimension( 350, 550 ) );
+		dialog.setSize( 350, 550 );
 		dialog.setResizable( false );
 		
-		dialog.getContentPane().setLayout( new BoxLayout( dialog.getContentPane(), BoxLayout.PAGE_AXIS ) );
+		dialog.getContentPane().setLayout( new MigLayout( "align center center") );
 		
-		text = new JTextField( 50 );
+		text = new JTextField();
 		JLabel textLabel = new JLabel( "Name of Event:" );
 		textLabel.setLabelFor( text );
-		JPanel textPanel = new JPanel();
-		textPanel.add( textLabel, BorderLayout.WEST );
-		textPanel.add( text, BorderLayout.EAST );
-		dialog.getContentPane().add( textPanel );
+		dialog.getContentPane().add( textLabel, "align right" );
+		dialog.getContentPane().add( text, "align left, wrap 10px, growx" );
 		
-		year = new JTextField( 9 );
+		year = new JTextField();
 		JLabel yearLabel = new JLabel( "Year:" );
 		yearLabel.setLabelFor( year );
-		JPanel yearPanel = new JPanel();
-		yearPanel.add( yearLabel, BorderLayout.WEST );
-		yearPanel.add( year, BorderLayout.EAST );
-		dialog.getContentPane().add( yearPanel );
+		dialog.getContentPane().add( yearLabel, "align right" );
+		dialog.getContentPane().add( year, "align left, wrap, growx" );
 		
-		month = new JTextField( 9 );
+		month = new JTextField();
 		JLabel monthLabel = new JLabel( "Month:" );
 		monthLabel.setLabelFor( month );
-		JPanel monthPanel = new JPanel();
-		monthPanel.add( monthLabel, BorderLayout.WEST );
-		monthPanel.add( month, BorderLayout.EAST );
-		dialog.getContentPane().add( monthPanel );
+		dialog.getContentPane().add( monthLabel, "align right" );
+		dialog.getContentPane().add( month, "align left, wrap, growx" );
 		
-		day = new JTextField( 9 );
+		day = new JTextField();
 		JLabel dayLabel = new JLabel( "Day:" );
 		dayLabel.setLabelFor( day );
-		JPanel dayPanel = new JPanel();
-		dayPanel.add( dayLabel, BorderLayout.WEST );
-		dayPanel.add( day, BorderLayout.EAST );
-		dialog.getContentPane().add( dayPanel );
+		dialog.getContentPane().add( dayLabel, "align right" );
+		dialog.getContentPane().add( day, "align left, wrap, growx" );
 		
-		hour = new JTextField( 9 );
+		hour = new JTextField();
 		JLabel hourLabel = new JLabel( "Hour:" );
 		hourLabel.setLabelFor( hour );
-		JPanel hourPanel = new JPanel();
-		hourPanel.add( hourLabel, BorderLayout.WEST );
-		hourPanel.add( hour, BorderLayout.EAST );
-		dialog.getContentPane().add( hourPanel );
+		dialog.getContentPane().add( hourLabel, "align right" );
+		dialog.getContentPane().add( hour, "align left, wrap, growx" );
 		
-		minute = new JTextField( 9 );
+		minute = new JTextField();
 		JLabel minuteLabel = new JLabel( "Minute:" );
 		minuteLabel.setLabelFor( minute );
-		JPanel minutePanel = new JPanel();
-		minutePanel.add( minuteLabel, BorderLayout.WEST );
-		minutePanel.add( minute, BorderLayout.EAST );
-		dialog.getContentPane().add( minutePanel );
+		dialog.getContentPane().add( minuteLabel, "align right" );
+		dialog.getContentPane().add( minute, "align left, wrap, growx" );
 		
-		second = new JTextField( 9 );
+		second = new JTextField();
 		JLabel secondLabel = new JLabel( "Second:" );
 		secondLabel.setLabelFor( second );
-		JPanel secondPanel = new JPanel();
-		secondPanel.add( secondLabel, BorderLayout.WEST );
-		secondPanel.add( second, BorderLayout.EAST );
-		dialog.getContentPane().add( secondPanel );
+		dialog.getContentPane().add( secondLabel, "align right" );
+		dialog.getContentPane().add( second, "align left, wrap 10px, growx" );
 		
-		link = new JTextField( 50 );
+		link = new JTextField();
 		JLabel linkLabel = new JLabel( "Link:" );
 		linkLabel.setLabelFor( link );
-		JPanel linkPanel = new JPanel();
-		linkPanel.add( linkLabel, BorderLayout.WEST );
-		linkPanel.add( link, BorderLayout.EAST );
-		dialog.getContentPane().add( linkPanel );
+		dialog.getContentPane().add( linkLabel, "align right" );
+		dialog.getContentPane().add( link, "align left, wrap, growx" );
 		
-		location = new JTextField( 50 );
+		location = new JTextField();
 		JLabel locationLabel = new JLabel( "Location:" );
 		locationLabel.setLabelFor( location );
-		JPanel locationPanel = new JPanel();
-		locationPanel.add( locationLabel, BorderLayout.WEST );
-		locationPanel.add( location, BorderLayout.EAST );
-		dialog.getContentPane().add( locationPanel );
+		dialog.getContentPane().add( locationLabel, "align right" );
+		dialog.getContentPane().add( location, "align left, wrap, growx" );
 		
-		tags = new JTextField( 50 );
+		tags = new JTextField();
 		tags.setToolTipText( "Tags are comma separated." );
 		JLabel tagsLabel = new JLabel( "Tags:" );
 		tagsLabel.setLabelFor( tags );
-		JPanel tagsPanel = new JPanel();
-		tagsPanel.add( tagsLabel, BorderLayout.WEST );
-		tagsPanel.add( tags, BorderLayout.EAST );
-		dialog.getContentPane().add( tagsPanel );
+		dialog.getContentPane().add( tagsLabel, "align right" );
+		dialog.getContentPane().add( tags, "align left, wrap 15px, growx" );
 		
 		priority = new JSlider( 0, 100 );
 		priority.setMajorTickSpacing( 10 );
@@ -142,10 +123,8 @@ public class EditEventDialog implements ActionListener
 		priority.setToolTipText( "100 is the most important, 0 is the least." );
 		JLabel priorityLabel = new JLabel( "Priority:" );
 		priorityLabel.setLabelFor( priority );
-		JPanel priorityPanel = new JPanel();
-		priorityPanel.add( priorityLabel, BorderLayout.WEST );
-		priorityPanel.add( priority, BorderLayout.EAST );
-		dialog.getContentPane().add( priorityPanel );
+		dialog.getContentPane().add( priorityLabel, "span, wrap, align center" );
+		dialog.getContentPane().add( priority, "span, wrap 15px, align center" );
 		
 		description = new JTextArea( 20, 5 );
 		description.setLineWrap( true );
@@ -157,24 +136,18 @@ public class EditEventDialog implements ActionListener
 		descScroll.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
 		JLabel descLabel = new JLabel( "Description:" );
 		descLabel.setLabelFor( descScroll );
-		JPanel descPanel = new JPanel();
-		descPanel.setLayout( new BoxLayout( descPanel, BoxLayout.LINE_AXIS ) );
-		descPanel.add( descLabel );
-		descPanel.add( descScroll );
-		dialog.getContentPane().add( descPanel );
+		dialog.getContentPane().add( descLabel, "span, wrap, align center" );
+		dialog.getContentPane().add( descScroll, "span, wrap, align center, growx, wmin 300" );
 		
-		JPanel buttonPanel = new JPanel();
 		submit = new JButton( "Submit" );
 		submit.addActionListener( this );
 		submit.setActionCommand( "submit" );
-		buttonPanel.add( submit );
+		dialog.getContentPane().add( submit, "align right" );
 		
 		cancel = new JButton( "Cancel" );
 		cancel.addActionListener( this );
 		cancel.setActionCommand( "cancel" );
-		dialog.getContentPane().add( cancel );
-		buttonPanel.add( cancel );
-		dialog.getContentPane().add( buttonPanel );
+		dialog.getContentPane().add( cancel, "align left" );
 	}
 	
 	public void showEventDialog( Event e, Integer yeari )

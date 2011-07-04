@@ -1,4 +1,4 @@
-package timeline;
+package com.phyloa.timeline;
 
 import java.awt.Component;
 import java.awt.Desktop;
@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import timeline.Item;
 
 public class RightClickMenu implements ActionListener
 {

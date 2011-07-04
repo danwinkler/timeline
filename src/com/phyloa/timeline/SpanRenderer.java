@@ -1,6 +1,9 @@
-package timeline;
+package com.phyloa.timeline;
 
 import java.awt.FontMetrics;
+
+import timeline.Item;
+import timeline.Span;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Renderer;
@@ -22,7 +25,7 @@ public class SpanRenderer extends ItemRenderer
 	}
 	
 	@Override
-	public void place( Timeline line )
+	public void place( Timeline line, TimelinePreferences tp )
 	{
 		y = 20;
 		width = line.getDrawX( e.end ) - line.getDrawX( e.start ); 
@@ -57,15 +60,16 @@ public class SpanRenderer extends ItemRenderer
 	}
 	
 	@Override
-	public void render( Renderer r, Item select, Item hover )
+	public void render( Renderer r, Item select, Item hover, TimelinePreferences tp )
 	{
 		boolean selected = select == e;
 		boolean hovered = hover == e;
-		r.color( selected ? 255 : 0, 0, 0 );
+		r.color( selected ? tp.selectColor : tp.lineColor );
 		r.line( x, y, x, y+height );
 		r.line( x+width, y, x+width, y+height );
 		r.line( x, y+(height/2), x+width, y+(height/2) );
-		r.text( e.name, x+(width/2) - strLen( e.name )/2, y+(height/2)-1 );
+		r.color( selected ? tp.selectColor : tp.textColor );
+		r.text( e.name, x+(width/2) - strLen( e.name, r )/2, y+(height/2)-1-tp.lineThickness );
 		r.color( (e.priority / 100.f) * 255, 0, ((100-e.priority) / 100.f) * 255 );
 		r.fillOval( x + (width / 2) - 4, y + (height / 2) + 2, 8, 8 );
 		
@@ -77,9 +81,10 @@ public class SpanRenderer extends ItemRenderer
 		}
 	}
 	
-	private int strLen( String s )
+	private int strLen( String s, Renderer r )
 	{
-		return s.length() * 7;
+		FontMetrics fm = ((Graphics2DIRenderer)r).g.getFontMetrics();
+		return fm.stringWidth( s );
 	}
 	
 	@Override
