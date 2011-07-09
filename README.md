@@ -5,9 +5,9 @@
 #Changelog
 
 * 0.11b
-- Added More Settings
+    * Added More Settings
 * 0.1b 
-- First Beta
+    * First Beta
 
 # Todo
 
