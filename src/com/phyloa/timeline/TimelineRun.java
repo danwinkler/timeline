@@ -655,4 +655,10 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		timeline.priority = priority.getValue();
 		timelineChanged();
 	}
+
+	public void deleteItem( Item item )
+	{
+		timeline.items.remove( item );
+		timelineChanged();
+	}
 }

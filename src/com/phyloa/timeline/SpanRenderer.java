@@ -71,7 +71,7 @@ public class SpanRenderer extends ItemRenderer
 		r.color( selected ? tp.selectColor : tp.textColor );
 		r.text( e.name, x+(width/2) - strLen( e.name, r )/2, y+(height/2)-1-tp.lineThickness );
 		r.color( (e.priority / 100.f) * 255, 0, ((100-e.priority) / 100.f) * 255 );
-		r.fillOval( x + (width / 2) - 4, y + (height / 2) + 2, 8, 8 );
+		r.fillOval( x + (width / 2) - 4, y + (height / 2) + 4, 8, 8 );
 		
 		if( hovered )
 		{

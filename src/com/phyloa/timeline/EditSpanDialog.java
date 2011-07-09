@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
@@ -269,87 +270,95 @@ public class EditSpanDialog implements ActionListener
 
 	public void actionPerformed( ActionEvent e ) 
 	{
-		//GOTO hack
-		do
+		if( e.getActionCommand().equals( "submit" ) )
 		{
-			if( e.getActionCommand().equals( "submit" ) )
+			String etext = stext.getText().trim();
+			if( etext.isEmpty() ) 
 			{
-				String etext = stext.getText().trim();
-				if( etext.isEmpty() ) break; //GOTO
-				String eyear = syear.getText().trim();
-				if( eyear.isEmpty() ) break; //GOTO
-				String emonth = smonth.getText().trim();
-				String eday = sday.getText().trim();
-				String ehour = shour.getText().trim();
-				String eminute = sminute.getText().trim();
-				String esecond = ssecond.getText().trim();
-				int iyear;
-				try { iyear = Integer.parseInt( eyear ); } catch( NumberFormatException nfe ) { iyear = 0; }
-				int imonth;
-				try { imonth = Integer.parseInt( emonth ); } catch( NumberFormatException nfe ) { imonth = 0; }
-				int iday;
-				try { iday = Integer.parseInt( eday ); } catch( NumberFormatException nfe ) { iday = 0; }
-				int ihour;
-				try { ihour = Integer.parseInt( ehour ); } catch( NumberFormatException nfe ) { ihour = 0; }
-				int iminute;
-				try { iminute = Integer.parseInt( eminute ); } catch( NumberFormatException nfe ) { iminute = 0; }
-				int isecond;
-				try { isecond = Integer.parseInt( esecond ); } catch( NumberFormatException nfe ) { isecond = 0; }
-				
-				String efyear = fyear.getText().trim();
-				if( efyear.isEmpty() ) break; //GOTO
-				String efmonth = fmonth.getText().trim();
-				String efday = fday.getText().trim();
-				String efhour = fhour.getText().trim();
-				String efminute = fminute.getText().trim();
-				String efsecond = fsecond.getText().trim();
-				int ifyear;
-				try { ifyear = Integer.parseInt( efyear ); } catch( NumberFormatException nfe ) { ifyear = 0; }
-				int ifmonth;
-				try { ifmonth = Integer.parseInt( efmonth ); } catch( NumberFormatException nfe ) { ifmonth = 1; }
-				int ifday;
-				try { ifday = Integer.parseInt( efday ); } catch( NumberFormatException nfe ) { ifday = 1; }
-				int ifhour;
-				try { ifhour = Integer.parseInt( efhour ); } catch( NumberFormatException nfe ) { ifhour = 0; }
-				int ifminute;
-				try { ifminute = Integer.parseInt( efminute ); } catch( NumberFormatException nfe ) { ifminute = 0; }
-				int ifsecond;
-				try { ifsecond = Integer.parseInt( efsecond ); } catch( NumberFormatException nfe ) { ifsecond = 0; }
-				
-				TDate startDate = new TDate( iyear, imonth, iday, ihour, iminute, isecond );
-				TDate endDate = new TDate( ifyear, ifmonth, ifday, ifhour, ifminute, ifsecond );
-				
-				String[] sTags = tags.getText().split(",");
-				ArrayList<String> aTags = new ArrayList<String>();
-				for( int i = 0; i < sTags.length; i++ )
-				{
-					aTags.add( sTags[i].trim() );
-				}
-				
-				if( edit == null )
-				{
-					Span span = new Span( etext, startDate, endDate );
-					span.setData( "link", link.getText().trim() );
-					span.setData( "loc", location.getText().trim() );
-					span.setData( "desc", description.getText().trim() );
-					span.priority = priority.getValue();
-					span.tags = aTags;
-					callback.dialogCompleted( span, true );
-				}
-				else
-				{
-					edit.start = startDate;
-					edit.end = endDate;
-					edit.name = etext;
-					edit.setData( "link", link.getText().trim() );
-					edit.setData( "loc", location.getText().trim() );
-					edit.setData( "desc", description.getText().trim() );
-					edit.priority = priority.getValue();
-					edit.tags = aTags;
-					callback.dialogCompleted( edit, false );
-				}
+				JOptionPane.showMessageDialog( dialog, "Please enter a name for the Span.", "Span Error", JOptionPane.ERROR_MESSAGE );
+				return; 
 			}
-		} while( false );
+			String eyear = syear.getText().trim();
+			if( eyear.isEmpty() ) 
+			{
+				JOptionPane.showMessageDialog( dialog, "Please enter a star year for the Span.", "Span Error", JOptionPane.ERROR_MESSAGE );
+				return;
+			}
+			String emonth = smonth.getText().trim();
+			String eday = sday.getText().trim();
+			String ehour = shour.getText().trim();
+			String eminute = sminute.getText().trim();
+			String esecond = ssecond.getText().trim();
+			int iyear;
+			try { iyear = Integer.parseInt( eyear ); } catch( NumberFormatException nfe ) { iyear = 0; }
+			int imonth;
+			try { imonth = Integer.parseInt( emonth ); } catch( NumberFormatException nfe ) { imonth = 0; }
+			int iday;
+			try { iday = Integer.parseInt( eday ); } catch( NumberFormatException nfe ) { iday = 0; }
+			int ihour;
+			try { ihour = Integer.parseInt( ehour ); } catch( NumberFormatException nfe ) { ihour = 0; }
+			int iminute;
+			try { iminute = Integer.parseInt( eminute ); } catch( NumberFormatException nfe ) { iminute = 0; }
+			int isecond;
+			try { isecond = Integer.parseInt( esecond ); } catch( NumberFormatException nfe ) { isecond = 0; }
+			
+			String efyear = fyear.getText().trim();
+			if( efyear.isEmpty() )
+			{
+				JOptionPane.showMessageDialog( dialog, "Please enter a end year for the Span.", "Span Error", JOptionPane.ERROR_MESSAGE );
+				return;
+			}
+			String efmonth = fmonth.getText().trim();
+			String efday = fday.getText().trim();
+			String efhour = fhour.getText().trim();
+			String efminute = fminute.getText().trim();
+			String efsecond = fsecond.getText().trim();
+			int ifyear;
+			try { ifyear = Integer.parseInt( efyear ); } catch( NumberFormatException nfe ) { ifyear = 0; }
+			int ifmonth;
+			try { ifmonth = Integer.parseInt( efmonth ); } catch( NumberFormatException nfe ) { ifmonth = 1; }
+			int ifday;
+			try { ifday = Integer.parseInt( efday ); } catch( NumberFormatException nfe ) { ifday = 1; }
+			int ifhour;
+			try { ifhour = Integer.parseInt( efhour ); } catch( NumberFormatException nfe ) { ifhour = 0; }
+			int ifminute;
+			try { ifminute = Integer.parseInt( efminute ); } catch( NumberFormatException nfe ) { ifminute = 0; }
+			int ifsecond;
+			try { ifsecond = Integer.parseInt( efsecond ); } catch( NumberFormatException nfe ) { ifsecond = 0; }
+			
+			TDate startDate = new TDate( iyear, imonth, iday, ihour, iminute, isecond );
+			TDate endDate = new TDate( ifyear, ifmonth, ifday, ifhour, ifminute, ifsecond );
+			
+			String[] sTags = tags.getText().split(",");
+			ArrayList<String> aTags = new ArrayList<String>();
+			for( int i = 0; i < sTags.length; i++ )
+			{
+				aTags.add( sTags[i].trim() );
+			}
+			
+			if( edit == null )
+			{
+				Span span = new Span( etext, startDate, endDate );
+				span.setData( "link", link.getText().trim() );
+				span.setData( "loc", location.getText().trim() );
+				span.setData( "desc", description.getText().trim() );
+				span.priority = priority.getValue();
+				span.tags = aTags;
+				callback.dialogCompleted( span, true );
+			}
+			else
+			{
+				edit.start = startDate;
+				edit.end = endDate;
+				edit.name = etext;
+				edit.setData( "link", link.getText().trim() );
+				edit.setData( "loc", location.getText().trim() );
+				edit.setData( "desc", description.getText().trim() );
+				edit.priority = priority.getValue();
+				edit.tags = aTags;
+				callback.dialogCompleted( edit, false );
+			}
+		}
 		
 		dialog.setVisible( false );
 		dialog.dispose();

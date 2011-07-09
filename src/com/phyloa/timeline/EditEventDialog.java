@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
@@ -193,9 +194,17 @@ public class EditEventDialog implements ActionListener
 		if( e.getActionCommand().equals( "submit" ) )
 		{
 			String etext = text.getText().trim();
-			if( etext.isEmpty() ) return;
+			if( etext.isEmpty() ) 
+			{
+				JOptionPane.showMessageDialog( dialog, "Please enter a name for the event.", "Event Error", JOptionPane.ERROR_MESSAGE );
+				return;
+			}
 			String eyear = year.getText().trim();
-			if( eyear.isEmpty() ) return;
+			if( eyear.isEmpty() ) 
+			{
+				JOptionPane.showMessageDialog( dialog, "Please enter a year for the event.", "Event Error", JOptionPane.ERROR_MESSAGE );
+				return;
+			}
 			String emonth = month.getText().trim();
 			String eday = day.getText().trim();
 			String ehour = hour.getText().trim();

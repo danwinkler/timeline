@@ -41,6 +41,11 @@ public class RightClickMenu implements ActionListener
 			edit.addActionListener( this );
 			popup.add( edit );
 			
+			JMenuItem delete = new JMenuItem( "Delete" );
+			delete.setActionCommand( "delete" );
+			delete.addActionListener( this );
+			popup.add( delete );
+			
 			if( i.getData( "link" ) != null && !i.getData( "link" ).equals( "" ) )
 			{
 				JMenuItem link = new JMenuItem( "Visit Link" );
@@ -75,6 +80,10 @@ public class RightClickMenu implements ActionListener
 		if( e.getActionCommand().equals( "edit" ) )
 		{
 			callback.editItem( item );
+		}
+		else if( e.getActionCommand().equals( "delete" ) )
+		{
+			callback.deleteItem( item );
 		}
 		else if( e.getActionCommand().equals( "link" ) )
 		{
