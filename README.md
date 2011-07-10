@@ -15,6 +15,9 @@
 
 # Todo
 
+1. Add PNG export
+2. (Maybe) Add small macro view bar to bottom of main view, to show where items are on a large scale.
+
 # Buglist
 
 1. Priority Culling cuts out too many items, too aggressively
