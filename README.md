@@ -16,7 +16,8 @@
 # Todo
 
 1. Add scrollable Metadata box
-2. Fix Inaccurate Timeline bar
+2. Add PNG export
+3. (Maybe) Add small macro view bar to bottom of main view, to show where items are on a large scale.
 
 # Buglist
 
