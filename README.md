@@ -1,6 +1,6 @@
 # Timeline
 
-[Windows Download](https://github.com/downloads/danwinkler/timeline/dtimeline0.2b.exe)
+[Windows Download](https://github.com/downloads/danwinkler/timeline/dtimeline0.3b.exe)
 
 #Changelog
 
