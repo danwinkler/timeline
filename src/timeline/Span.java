@@ -6,7 +6,7 @@ import com.phyloa.dlib.renderer.Renderer;
 import com.phyloa.timeline.RenderLines;
 import com.phyloa.timeline.Timeline;
 
-public class Span implements Item 
+public class Span implements Item
 {
 	/**
 	 * 
@@ -77,7 +77,7 @@ public class Span implements Item
 		if( description != null )
 		{
 			ArrayList<String> lines = Timeline.breakIntoLines( description, 40 );
-			for( int i = 0; i < lines.size(); i++ )
+			for( int i = 0; i < Math.min( lines.size(), 11 ); i++ )
 			{
 				rl.add( lines.get( i ) );
 			}

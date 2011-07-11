@@ -84,7 +84,7 @@ public class Event implements Item
 		if( description != null && !description.equals( "" ) )
 		{
 			ArrayList<String> lines = Timeline.breakIntoLines( description, 40 );
-			for( int i = 0; i < lines.size(); i++ )
+			for( int i = 0; i < Math.min( lines.size(), 11 ); i++ )
 			{
 				rl.add( lines.get( i ) );
 			}

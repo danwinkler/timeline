@@ -17,6 +17,8 @@ import com.phyloa.dlib.util.KeyHandler;
 
 public class Timeline 
 {
+	public static final int maxZoom = 10;
+	
 	ArrayList<Item> items = new ArrayList<Item>();
 	
 	ArrayList<ItemRenderer> visible = new ArrayList<ItemRenderer>();
@@ -70,6 +72,8 @@ public class Timeline
 	
 	public void zoomIn( float amt )
 	{
+		if( zoom < maxZoom )
+			zoom = maxZoom;
 		zoom -= zoom * amt;
 		updateVisibleItems();
 	}
@@ -128,7 +132,10 @@ public class Timeline
 				break;
 			}
 		}
+		
+		//Sort to draw from bottom to top so lines go over other items
 		Collections.sort( visible );
+		
 		for( int i = 0; i < visible.size(); i++ )
 		{
 			ItemRenderer e = visible.get( i );

@@ -613,11 +613,11 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		float rot = e.getWheelRotation();
 		if( rot < 0 )
 		{
-			timeline.zoomIn( -e.getWheelRotation() * .2f );
+			timeline.zoomIn( -e.getWheelRotation() * .08f );
 		}
 		else
 		{
-			timeline.zoomOut( e.getWheelRotation() * .2f );
+			timeline.zoomOut( e.getWheelRotation() * .08f );
 		}
 		
 		timelineChanged();

@@ -15,6 +15,12 @@
 
 # Todo
 
+1. Add scrollable Metadata box
+2. Fix Inaccurate Timeline bar
+
 # Buglist
 
 1. Priority Culling cuts out too many items, too aggressively
+2. Spans sometimes don't end on correct date. 5 years late?
+3. Don't let description overflow
+4. Fix everything disappears sometimes when zooming
