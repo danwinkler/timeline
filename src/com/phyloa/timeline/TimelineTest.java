@@ -18,7 +18,8 @@ public class TimelineTest extends Graphics2DRenderer
 		t = new Timeline( this );
 		t.setKeyHandler( k );
 		
-		t.setZoomYears( 25 );
+		t.firstDate = new TDate( 1990, 1, 1 );
+		t.lastDate = new TDate( 2010, 1, 1 );
 		
 		t.add( new Event( "Dan's Birthday", 1990, 04, 12 ) );
 		t.add( new Event( "Zoe's Birthday", 1990, 03, 31 ) );

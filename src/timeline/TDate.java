@@ -36,9 +36,42 @@ public class TDate implements Serializable
 		year = 2000;
 	}
 	
+	public TDate( String date ) throws NumberFormatException
+	{
+		String[] parts = date.split( "/" );
+		for( int i = 0; i < parts.length; i++ )
+		{
+			switch( i )
+			{
+			case 0:
+				year = Integer.parseInt( parts[i] );
+				break;
+			case 1:
+				month = Integer.parseInt( parts[i] );
+				break;
+			case 2:
+				day = Integer.parseInt( parts[i] );
+				break;
+			case 3:
+				hour = Integer.parseInt( parts[i] );
+				break;
+			case 4:
+				minute = Integer.parseInt( parts[i] );
+				break;
+			case 5:
+				second = Integer.parseInt( parts[i] );
+				break;
+			}
+		}
+	}
+
 	public float monthDiff( TDate d )
 	{
-		return ((year-d.year)*12) + (month-d.month) + ((day-d.day)*(1.f/30.f));
+		int tmonth = Math.max( 0, month-1 );
+		int dmonth = Math.max( 0, d.month-1 );
+		int tday = Math.max( 0, day-1 );
+		int dday = Math.max( 0, d.day-1 );
+		return ((year-d.year)*12) + (tmonth-dmonth) + ((tday-dday)*(1.f/30.f));
 	}
 	
 	@Override
@@ -57,6 +90,11 @@ public class TDate implements Serializable
 			}
 		}
 		return str;
+	}
+	
+	public String toStringSlashed()
+	{
+		return year + "/" + month + "/" + day + "/" + hour + "/" + minute + "/" + second;
 	}
 	
 	public int getYear()
@@ -229,5 +267,44 @@ public class TDate implements Serializable
 			}
 		}
 		return false;
+	}
+
+	public TDate addHours( int i )
+	{
+		int nh = hour + i;
+		int nd = day;
+		int nm = month;
+		int ny = year;
+		while( nh > 23 )
+		{
+			nh -= 24;
+			nd++;
+		}
+		while( nh < 0 )
+		{
+			nh += 24;
+			nd--;
+		}
+		while( nd > getDaysInMonth( nm, ny ) )
+		{
+			nd -= getDaysInMonth( nm, ny );
+			nm++;
+		}
+		while( nd < 1 )
+		{
+			nd += getDaysInMonth( nm, ny );
+			nm--;
+		}
+		while( nm > 12 )
+		{
+			nm -= 12;
+			ny++;
+		}
+		while( nm < 1 )
+		{
+			nm += 12;
+			ny--;
+		}
+		return new TDate( ny, nm, nd, hour, minute, second );
 	}
 }

@@ -27,8 +27,8 @@ public class Timeline
 	
 	KeyHandler k;
 	
-	TDate centerDate = new TDate();
-	float zoom = 12;
+	TDate firstDate = new TDate();
+	TDate lastDate = new TDate();
 	
 	Item selected = null;
 	Item hover = null;
@@ -43,6 +43,7 @@ public class Timeline
 	public Timeline( Renderer r )
 	{
 		this.r = r;
+		this.clear();
 	}
 	
 	public void setKeyHandler( KeyHandler k )
@@ -62,36 +63,43 @@ public class Timeline
 		}
 		if( k.up )
 		{
-			zoomIn( .01f );
+			zoomIn( .1f );
 		}
 		if( k.down )
 		{
-			zoomOut( .01f );
+			zoomOut( .1f );
 		}
 	}
 	
 	public void zoomIn( float amt )
 	{
-		if( zoom < maxZoom )
-			zoom = maxZoom;
-		zoom -= zoom * amt;
+		float diff = lastDate.monthDiff( firstDate );
+		firstDate = firstDate.addDays( (int)(diff * amt) );
+		lastDate = lastDate.addDays( -(int)(diff * amt) );
 		updateVisibleItems();
 	}
 	
 	public void zoomOut( float amt )
 	{
-		zoom += zoom * amt;
+		float diff = lastDate.monthDiff( firstDate );
+		firstDate = firstDate.addDays( -(int)(diff * amt) );
+		lastDate = lastDate.addDays( (int)(diff * amt) );
 		updateVisibleItems();
 	}
 	
 	public void scrollRight( float amt )
 	{
-		centerDate = centerDate.addDays( (int)(zoom * amt) + 1 );
+		float diff = lastDate.monthDiff( firstDate );
+		firstDate = firstDate.addHours( (int)(diff * amt) );
+		lastDate = lastDate.addHours( (int)(diff * amt) );
 		updateVisibleItems();
 	}
+	
 	public void scrollLeft( float amt )
 	{
-		centerDate = centerDate.addDays( -((int)(zoom * amt) + 1) );
+		float diff = lastDate.monthDiff( firstDate );
+		firstDate = firstDate.addHours( -((int)(diff * amt)) );
+		lastDate = lastDate.addHours( -(int)(diff * amt) );
 		updateVisibleItems();
 	}
 	
@@ -177,12 +185,16 @@ public class Timeline
 		//DRAW a base line
 		((Graphics2DIRenderer)r).g.setStroke( new BasicStroke( tp.lineThickness ) );
 		r.line( 0, height - 100, width, height - 100 );
-		//FIND distance between years in pixels
-		float yearSeparation = width / (zoom/12.f);
-		//CHOOSE year interval... LOL AT MY LOGIC
-		int interval = yearSeparation < 20 ? yearSeparation < 10 ? yearSeparation < 5 ? yearSeparation < 2.5f ? yearSeparation < .5 ? yearSeparation < .2f ? yearSeparation < .1f ? yearSeparation < .05f ? yearSeparation < .02f ? yearSeparation < .01f ? 5000 : 2000 : 1000 : 500 : 200 : 100 : 25 : 10 : 5 : 2 : 1;
+		
+		float pixelsBetweenYears = r.getWidth() / (lastDate.monthDiff( firstDate ) / 12.f );
+		int interval = 1; 
+		while( pixelsBetweenYears < 15 )
+		{
+			interval *= 10;
+			pixelsBetweenYears *= 10;
+		}
 		//CHOOSE first year to draw
-		int firstYear = (int) (centerDate.getYear() - Math.ceil((zoom/24.f)));
+		int firstYear = firstDate.getYear();
 		//LOCK firstYear to interval
 		while( firstYear % interval != 0 ) 
 		{
@@ -191,17 +203,46 @@ public class Timeline
 		//FIND pixel location of first year
 		float firstDrawX = getDrawX( new TDate( firstYear, 1, 1 ) );
 		//FIND last year to draw
-		int lastYear = (int) (centerDate.getYear() + Math.ceil((zoom/24.f)));
+		int lastYear = lastDate.getYear();
 		for( int i = firstYear; i <= lastYear; i+= interval )
 		{
 			r.pushMatrix();
-			r.translate( firstDrawX + yearSeparation*(i-firstYear), height-100 );
+			r.translate( getDrawX( new TDate( i, 1, 1 ) ), height-100 );
 			r.rotate( (float)Math.PI/2 );
 			r.color( tp.lineColor );
 			r.line( 0, 0, -20, 0 );
 			r.color( tp.textColor );
 			r.text( i + "", 3, 4 );
 			r.popMatrix();
+			if( pixelsBetweenYears > 180 )
+			{
+				for( int m = 1; m <= 12; m++ )
+				{
+					r.pushMatrix();
+					r.translate( getDrawX( new TDate( i, m, 1 ) ), height-100 );
+					r.rotate( (float)Math.PI/2 );
+					r.color( tp.lineColor );
+					r.line( 0, 0, -20, 0 );
+					r.color( tp.textColor );
+					r.text( TDate.getNameOfMonth( m ) + "", m == 1 ? 40 : 3, 4 );
+					r.popMatrix();
+					
+					if( (pixelsBetweenYears / 12) > 18*TDate.getDaysInMonth( m, i ) )
+					{
+						for( int d = 0; d <= TDate.getDaysInMonth( m, i ); d++ )
+						{
+							r.pushMatrix();
+							r.translate( getDrawX( new TDate( i, m, d ) ), height-100 );
+							r.rotate( (float)Math.PI/2 );
+							r.color( tp.lineColor );
+							r.line( 0, 0, -20, 0 );
+							r.color( tp.textColor );
+							r.text( d + "", 3, 4 );
+							r.popMatrix();
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -226,22 +267,16 @@ public class Timeline
 	public int getDrawX( TDate d )
 	{
 		int width = r.getWidth();
-		float dist = d.monthDiff( centerDate );
-		dist += zoom/2;
-		dist = dist / zoom;
+		float dist = d.monthDiff( firstDate );
+		float diff = lastDate.monthDiff( firstDate );
+		dist = dist / diff;
 		return (int) (dist * width);
 	}
 	
 	public int getYearFromMouse( int x )
 	{
 		//int width = r.getWidth();
-		//int diff = x - width;
 		return 0;
-	}
-
-	public void setZoomYears( int i ) 
-	{
-		zoom = i*12;
 	}
 	
 	public void updateVisibleItems()
@@ -250,7 +285,7 @@ public class Timeline
 		for( int i = 0; i < items.size(); i++ )
 		{
 			Item item = items.get( i );
-			if( item.isVisible( centerDate, zoom ) && item.getPriority() >= priority && isTagged( item ) )
+			if( item.isVisible( firstDate, lastDate ) && item.getPriority() >= priority && isTagged( item ) )
 			{
 				visible.add( createRenderer( item ) );
 			}
@@ -260,7 +295,7 @@ public class Timeline
 	public void add( Item item ) 
 	{
 		items.add( item );
-		if( item.isVisible( centerDate, zoom ) )
+		if( item.isVisible( firstDate, lastDate ) )
 		{
 			visible.add( createRenderer( item ) );
 		}
@@ -283,8 +318,8 @@ public class Timeline
 	{
 		items.clear();
 		visible.clear();
-		zoom = 25*12;
-		centerDate = new TDate();
+		firstDate = new TDate( 1990, 1, 1 );
+		lastDate = new TDate( 2010, 1, 1 );
 		tp = new TimelinePreferences();
 	}
 
@@ -343,7 +378,7 @@ public class Timeline
 				text += "<item type=\"Event\">\n";
 				Event e = (Event)item;
 				text += "<name>" + e.name + "</name>\n";
-				text += "<date>" + e.date.toString() + "</date>\n";
+				text += "<date>" + e.date.toStringSlashed() + "</date>\n";
 				String loc = e.getData( "loc" );
 				String link = e.getData( "link" );
 				String desc = e.getData( "desc" );
@@ -358,8 +393,8 @@ public class Timeline
 				text += "<item type=\"Span\">\n";
 				Span e = (Span)item;
 				text += "<name>" + e.name + "</name>\n";
-				text += "<start>" + e.start.toString() + "</start>\n";
-				text += "<end>" + e.end.toString() + "</end>\n";
+				text += "<start>" + e.start.toStringSlashed() + "</start>\n";
+				text += "<end>" + e.end.toStringSlashed() + "</end>\n";
 				String loc = e.getData( "loc" );
 				String link = e.getData( "link" );
 				String desc = e.getData( "desc" );
@@ -412,5 +447,13 @@ public class Timeline
 		}
 		
 		return text;
+	}
+
+	public void setCenter( TDate center )
+	{
+		float diff = lastDate.monthDiff( firstDate );
+		diff /= 2;
+		firstDate = center.addMonths( (int) -diff );
+		lastDate = center.addMonths( (int) diff );
 	}
 }

@@ -26,9 +26,9 @@ public class Span implements Item
 		this.end = end;
 	}
 	
-	public boolean isVisible( TDate d, float zoom ) 
+	public boolean isVisible( TDate d, TDate lastDate ) 
 	{
-		return d.monthDiff( start )+zoom/2 > 0 && d.monthDiff( end )-zoom/2 < 0;
+		return !(start.isBefore( d ) && end.isBefore( d )) && !(lastDate.isBefore( d ) && lastDate.isBefore( lastDate ) );
 	}
 	
 	public int getPriority()
@@ -77,13 +77,13 @@ public class Span implements Item
 		if( description != null )
 		{
 			ArrayList<String> lines = Timeline.breakIntoLines( description, 40 );
-			for( int i = 0; i < Math.min( lines.size(), 11 ); i++ )
+			for( int i = 0; i < lines.size(); i++ )
 			{
 				rl.add( lines.get( i ) );
 			}
 		}
 		
-		rl.render( r );
+		rl.render( r, 11 );
 	}
 
 	public ArrayList<DoubleString> getData() 

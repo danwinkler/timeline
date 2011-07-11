@@ -35,9 +35,9 @@ public class Event implements Item
 		this( name, new TDate( year, month, day ) );
 	}
 	
-	public boolean isVisible( TDate d, float zoom ) 
+	public boolean isVisible( TDate d, TDate lastDate ) 
 	{
-		return Math.abs( date.monthDiff( d ) ) < zoom/2;
+		return d.isBefore( date ) && date.isBefore( lastDate );
 	}
 	
 	public int getPriority()
@@ -73,24 +73,31 @@ public class Event implements Item
 			String tagsText = "";
 			for( int i = 0; i < tags.size(); i++ )
 			{
-				tagsText += tags.get( i );
-				if( i < tags.size() - 1 )
+				String tag = tags.get( i ).trim();
+				if( !tag.equals( "" ) )
 				{
-					tagsText += ", ";
+					tagsText += tag;
+					if( i < tags.size() - 1 )
+					{
+						tagsText += ", ";
+					}
 				}
 			}
-			rl.add( "Tags: " + tagsText );
+			if( !tagsText.trim().equals( "" ) )
+			{
+				rl.add( "Tags: " + tagsText.trim() );
+			}
 		}
 		if( description != null && !description.equals( "" ) )
 		{
 			ArrayList<String> lines = Timeline.breakIntoLines( description, 40 );
-			for( int i = 0; i < Math.min( lines.size(), 11 ); i++ )
+			for( int i = 0; i < lines.size(); i++ )
 			{
 				rl.add( lines.get( i ) );
 			}
 		}
 		
-		rl.render( r );
+		rl.render( r, 11 );
 	}
 
 

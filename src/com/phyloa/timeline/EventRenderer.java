@@ -45,7 +45,7 @@ public class EventRenderer extends ItemRenderer
 			r.pushMatrix();
 				r.translate( tp.boxMargins, tp.boxMargins );
 				r.text( e.name, 2, 11 );
-				r.text( e.date.toString(), 2, 23 );
+				r.text( e.date.toString(), 2, 24 );
 			r.popMatrix();
 			r.color( select ? tp.selectColor : tp.lineColor );
 			if( tp.roundedCorners ) 

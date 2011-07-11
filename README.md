@@ -4,11 +4,18 @@
 
 #Changelog
 
+* 0.3b
+	* Added XML Import
+	* Changed How zoom works
+	* Fixed off by one error causing Items to not line up with dateline
+	* Fixed error causing spans to be displayed too wide
+	* Moved Date rendering slightly
+	* Changed Dateline year intervals
 * 0.2b
 	* Added Delete button in right click menu
 	* Added space between span and priority dot
 	* Added error popups in dialogs when no year or name is entered
-* 0.11b
+* 0.1.1b
     * Added More Settings
 * 0.1b 
     * First Beta
@@ -22,6 +29,5 @@
 # Buglist
 
 1. Priority Culling cuts out too many items, too aggressively
-2. Spans sometimes don't end on correct date. 5 years late?
-3. Don't let description overflow
-4. Fix everything disappears sometimes when zooming
+2. Don't let description overflow
+3. Fix everything disappears sometimes when zooming

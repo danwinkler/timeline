@@ -31,9 +31,7 @@ public class SpanRenderer extends ItemRenderer
 		width = line.getDrawX( e.end ) - line.getDrawX( e.start ); 
 		x = line.getDrawX( e.start );
 		height = 26;
-		
-		width *= ((float)e.priority / 100.f) + 1;
-		height *= ((float)e.priority / 100.f) + 1;
+
 		while( true )
 		{
 			boolean found = true;

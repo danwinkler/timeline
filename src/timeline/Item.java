@@ -7,7 +7,7 @@ import com.phyloa.dlib.renderer.Renderer;
 
 public interface Item extends Serializable, Comparable<Item>
 {
-	public boolean isVisible( TDate d, float zoom );
+	public boolean isVisible( TDate d, TDate lastDate );
 	
 	public int getPriority();
 	public ArrayList<String> getTags();

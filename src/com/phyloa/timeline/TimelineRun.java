@@ -38,21 +38,32 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import net.miginfocom.swing.MigLayout;
+import timeline.DoubleString;
 import timeline.Event;
 import timeline.Item;
 import timeline.Span;
+import timeline.TDate;
 import timeline.TimelineData;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DGraphics;
 
-public class TimelineRun implements KeyListener, ComponentListener, ActionListener, MouseListener, MouseWheelListener, MouseMotionListener, ChangeListener
+public class TimelineRun implements KeyListener, ComponentListener,
+		ActionListener, MouseListener, MouseWheelListener, MouseMotionListener,
+		ChangeListener
 {
 	Timeline timeline;
-	Graphics2DIRenderer r; 
+	Graphics2DIRenderer r;
 	
 	public JFrame container;
 	public JMenuBar menubar;
@@ -65,21 +76,31 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 	
 	public TimelineRun()
 	{
-		try {
-			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-		} catch (ClassNotFoundException e) {
+		try
+		{
+			UIManager
+					.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+		}
+		catch( ClassNotFoundException e )
+		{
 			e.printStackTrace();
-		} catch (InstantiationException e) {
+		}
+		catch( InstantiationException e )
+		{
 			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		}
+		catch( IllegalAccessException e )
+		{
 			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
+		}
+		catch( UnsupportedLookAndFeelException e )
+		{
 			e.printStackTrace();
 		}
 		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		r = new Graphics2DIRenderer( screenSize.width, screenSize.height );
-
+		
 		container = new JFrame( "Timeline" );
 		container.setPreferredSize( new Dimension( 800, 600 ) );
 		container.setSize( 800, 600 );
@@ -95,19 +116,22 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		menubar.add( fileMenu );
 		
 		JMenuItem newMenu = new JMenuItem( "New Timeline", 'N' );
-		newMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_N, java.awt.Event.CTRL_MASK ) );
+		newMenu.setAccelerator( KeyStroke.getKeyStroke(
+				java.awt.event.KeyEvent.VK_N, java.awt.Event.CTRL_MASK ) );
 		newMenu.setActionCommand( "new" );
 		newMenu.addActionListener( this );
 		fileMenu.add( newMenu );
 		
 		JMenuItem openMenu = new JMenuItem( "Open", 'O' );
-		openMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK ) );
+		openMenu.setAccelerator( KeyStroke.getKeyStroke(
+				java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK ) );
 		openMenu.setActionCommand( "open" );
 		openMenu.addActionListener( this );
 		fileMenu.add( openMenu );
 		
 		JMenuItem saveMenu = new JMenuItem( "Save", 'S' );
-		saveMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK ) );
+		saveMenu.setAccelerator( KeyStroke.getKeyStroke(
+				java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK ) );
 		saveMenu.setActionCommand( "save" );
 		saveMenu.addActionListener( this );
 		fileMenu.add( saveMenu );
@@ -132,24 +156,35 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		exporttextMenu.addActionListener( this );
 		fileMenu.add( exporttextMenu );
 		
+		fileMenu.addSeparator();
+		
+		JMenuItem importxmlMenu = new JMenuItem( "Import XML" );
+		importxmlMenu.setActionCommand( "importxml" );
+		importxmlMenu.addActionListener( this );
+		importxmlMenu.addActionListener( this );
+		fileMenu.add( importxmlMenu );
+		
 		JMenu timelineMenu = new JMenu( "Timeline" );
 		timelineMenu.setMnemonic( 'T' );
 		menubar.add( timelineMenu );
 		
 		JMenuItem addEventMenu = new JMenuItem( "Add Event", 'E' );
-		addEventMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_E, java.awt.Event.CTRL_MASK ) );
+		addEventMenu.setAccelerator( KeyStroke.getKeyStroke(
+				java.awt.event.KeyEvent.VK_E, java.awt.Event.CTRL_MASK ) );
 		addEventMenu.setActionCommand( "addevent" );
 		addEventMenu.addActionListener( this );
 		timelineMenu.add( addEventMenu );
 		
 		JMenuItem addSpanMenu = new JMenuItem( "Add Span", 'D' );
-		addSpanMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK ) );
+		addSpanMenu.setAccelerator( KeyStroke.getKeyStroke(
+				java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK ) );
 		addSpanMenu.setActionCommand( "addspan" );
 		addSpanMenu.addActionListener( this );
 		timelineMenu.add( addSpanMenu );
 		
 		JMenuItem editItemMenu = new JMenuItem( "Modify Item", 'M' );
-		editItemMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_Q, java.awt.Event.CTRL_MASK ) );
+		editItemMenu.setAccelerator( KeyStroke.getKeyStroke(
+				java.awt.event.KeyEvent.VK_Q, java.awt.Event.CTRL_MASK ) );
 		editItemMenu.setActionCommand( "edititem" );
 		editItemMenu.addActionListener( this );
 		timelineMenu.add( editItemMenu );
@@ -168,31 +203,24 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		container.getContentPane().add( toolbar, BorderLayout.SOUTH );
 		
 		/*
-		JButton fastBack = new JButton( "RW" );
-		fastBack.setMargin( new Insets( 10, 10, 10, 10 ) );
-		fastBack.setActionCommand( "fastback" );
-		fastBack.addActionListener( this );
-		toolbar.add( fastBack );
-		
-		JButton back = new JButton( "Back" );
-		back.setMargin( new Insets( 10, 10, 10, 10 ) );
-		back.setActionCommand( "back" );
-		back.addActionListener( this );
-		toolbar.add( back );
-		
-		JButton forward = new JButton( "Forward" );
-		forward.setMargin( new Insets( 10, 10, 10, 10 ) );
-		forward.setActionCommand( "forward" );
-		forward.addActionListener( this );
-		toolbar.add( forward );
-		
-		JButton fastForward = new JButton( "FF" );
-		fastForward.setMargin( new Insets( 10, 10, 10, 10 ) );
-		fastForward.setActionCommand( "fastforward" );
-		fastForward.addActionListener( this );
-		toolbar.add( fastForward );
-		*/
-		
+		 * JButton fastBack = new JButton( "RW" ); fastBack.setMargin( new
+		 * Insets( 10, 10, 10, 10 ) ); fastBack.setActionCommand( "fastback" );
+		 * fastBack.addActionListener( this ); toolbar.add( fastBack );
+		 * 
+		 * JButton back = new JButton( "Back" ); back.setMargin( new Insets( 10,
+		 * 10, 10, 10 ) ); back.setActionCommand( "back" );
+		 * back.addActionListener( this ); toolbar.add( back );
+		 * 
+		 * JButton forward = new JButton( "Forward" ); forward.setMargin( new
+		 * Insets( 10, 10, 10, 10 ) ); forward.setActionCommand( "forward" );
+		 * forward.addActionListener( this ); toolbar.add( forward );
+		 * 
+		 * JButton fastForward = new JButton( "FF" ); fastForward.setMargin( new
+		 * Insets( 10, 10, 10, 10 ) ); fastForward.setActionCommand(
+		 * "fastforward" ); fastForward.addActionListener( this ); toolbar.add(
+		 * fastForward );
+		 */
+
 		priority = new JSlider( 0, 100, 0 );
 		priority.setMajorTickSpacing( 10 );
 		priority.setMinorTickSpacing( 5 );
@@ -229,8 +257,6 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		
 		timeline = new Timeline( r );
 		
-		timeline.setZoomYears( 25 );
-		
 		changeTimelineSize( ip.getWidth(), ip.getHeight() );
 		ip.addComponentListener( this );
 		ip.addMouseListener( this );
@@ -257,16 +283,16 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 	
 	public static void main( String[] args )
 	{
-		@SuppressWarnings("unused")
+		@SuppressWarnings( "unused" )
 		TimelineRun tr = new TimelineRun();
 	}
-
-	public void keyPressed( KeyEvent e ) 
+	
+	public void keyPressed( KeyEvent e )
 	{
 		if( timeline != null && e.getSource() != tags )
 		{
 			switch( e.getKeyCode() )
-			{	
+			{
 			case KeyEvent.VK_UP:
 				timeline.zoomIn( .1f );
 				timelineChanged();
@@ -286,8 +312,8 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 			}
 		}
 	}
-
-	public void keyReleased( KeyEvent e ) 
+	
+	public void keyReleased( KeyEvent e )
 	{
 		if( e.getSource() == tags )
 		{
@@ -303,8 +329,8 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 			timelineChanged();
 		}
 	}
-
-	public void keyTyped( KeyEvent e ) 
+	
+	public void keyTyped( KeyEvent e )
 	{
 		
 	}
@@ -313,40 +339,40 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 	{
 		private static final long serialVersionUID = 1L;
 		private BufferedImage image;
-
-	    public ImagePanel( Image image2 ) 
-	    {
-	    	this.image = (BufferedImage) image2;
-	    }
-
-	    @Override
-		public void paintComponent( Graphics g ) 
-	    {
-	        g.drawImage(image, 0, 0, null);
-	    }
+		
+		public ImagePanel( Image image2 )
+		{
+			this.image = (BufferedImage)image2;
+		}
+		
+		@Override
+		public void paintComponent( Graphics g )
+		{
+			g.drawImage( image, 0, 0, null );
+		}
 	}
-
-	public void componentHidden(ComponentEvent arg0) 
+	
+	public void componentHidden( ComponentEvent arg0 )
 	{
 		changeTimelineSize( ip.getWidth(), ip.getHeight() );
 	}
-
-	public void componentMoved(ComponentEvent arg0) 
+	
+	public void componentMoved( ComponentEvent arg0 )
 	{
 		changeTimelineSize( ip.getWidth(), ip.getHeight() );
 	}
-
-	public void componentResized(ComponentEvent arg0) 
+	
+	public void componentResized( ComponentEvent arg0 )
 	{
 		changeTimelineSize( ip.getWidth(), ip.getHeight() );
 	}
-
-	public void componentShown(ComponentEvent arg0) 
+	
+	public void componentShown( ComponentEvent arg0 )
 	{
 		changeTimelineSize( ip.getWidth(), ip.getHeight() );
 	}
-
-	public void actionPerformed( ActionEvent e ) 
+	
+	public void actionPerformed( ActionEvent e )
 	{
 		if( e.getActionCommand().equals( "fastback" ) )
 		{
@@ -376,27 +402,34 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		else if( e.getActionCommand().equals( "open" ) )
 		{
 			final JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter( new FileNameExtensionFilter( "Timeline Files", "timeline" ) );
+			fc.addChoosableFileFilter( new FileNameExtensionFilter(
+					"Timeline Files", "timeline" ) );
 			int returnVal = fc.showOpenDialog( container );
 			if( returnVal == JFileChooser.APPROVE_OPTION )
 			{
 				File f = fc.getSelectedFile();
 				Object o = null;
-				try {
+				try
+				{
 					o = DFile.loadObject( f.getAbsolutePath() );
-				} catch (IOException e1) {
+				}
+				catch( IOException e1 )
+				{
 					e1.printStackTrace();
-				} catch (ClassNotFoundException e1) {
+				}
+				catch( ClassNotFoundException e1 )
+				{
 					e1.printStackTrace();
 				}
 				if( o instanceof TimelineData )
 				{
 					TimelineData dat = (TimelineData)o;
-					timeline.centerDate = dat.centerDate;
+					timeline.firstDate = dat.centerDate;
+					timeline.lastDate = dat.lastDate;
 					timeline.items = dat.items;
-					timeline.zoom = dat.zoom;
 					timeline.file = f;
-					timeline.tp = dat.tp == null ? new TimelinePreferences() : dat.tp;
+					timeline.tp = dat.tp == null ? new TimelinePreferences()
+							: dat.tp;
 					timelineChanged();
 				}
 			}
@@ -404,19 +437,21 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		else if( e.getActionCommand().equals( "save" ) )
 		{
 			TimelineData dat = new TimelineData();
-			dat.centerDate = timeline.centerDate;
+			dat.centerDate = timeline.firstDate;
+			dat.lastDate = timeline.lastDate;
 			dat.items = timeline.items;
-			dat.zoom = timeline.zoom;
 			dat.tp = timeline.tp;
 			if( timeline.file == null )
 			{
 				final JFileChooser fc = new JFileChooser();
-				fc.addChoosableFileFilter( new FileNameExtensionFilter( "Timeline Files", "timeline" ) );
+				fc.addChoosableFileFilter( new FileNameExtensionFilter(
+						"Timeline Files", "timeline" ) );
 				int returnVal = fc.showSaveDialog( container );
 				if( returnVal == JFileChooser.APPROVE_OPTION )
 				{
 					File f = fc.getSelectedFile();
-					try {
+					try
+					{
 						String filename = f.getAbsolutePath();
 						if( !filename.endsWith( ".timeline" ) )
 						{
@@ -424,16 +459,21 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 						}
 						DFile.saveObject( filename, dat );
 						timeline.file = f;
-					} catch (IOException e1) {
+					}
+					catch( IOException e1 )
+					{
 						e1.printStackTrace();
 					}
 				}
 			}
 			else
 			{
-				try {
+				try
+				{
 					DFile.saveObject( timeline.file.getAbsolutePath(), dat );
-				} catch (IOException e1) {
+				}
+				catch( IOException e1 )
+				{
 					e1.printStackTrace();
 				}
 			}
@@ -441,17 +481,19 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		else if( e.getActionCommand().equals( "saveas" ) )
 		{
 			final JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter( new FileNameExtensionFilter( "Timeline Files", "timeline" ) );
+			fc.addChoosableFileFilter( new FileNameExtensionFilter(
+					"Timeline Files", "timeline" ) );
 			int returnVal = fc.showSaveDialog( container );
 			if( returnVal == JFileChooser.APPROVE_OPTION )
 			{
 				File f = fc.getSelectedFile();
 				TimelineData dat = new TimelineData();
-				dat.centerDate = timeline.centerDate;
+				dat.centerDate = timeline.firstDate;
+				dat.lastDate = timeline.lastDate;
 				dat.items = timeline.items;
-				dat.zoom = timeline.zoom;
 				dat.tp = timeline.tp;
-				try {
+				try
+				{
 					String filename = f.getAbsolutePath();
 					if( !filename.endsWith( ".timeline" ) )
 					{
@@ -459,7 +501,9 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 					}
 					DFile.saveObject( filename, dat );
 					timeline.file = f;
-				} catch (IOException e1) {
+				}
+				catch( IOException e1 )
+				{
 					e1.printStackTrace();
 				}
 			}
@@ -481,25 +525,30 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		}
 		else if( e.getActionCommand().equals( "settings" ) )
 		{
-			PreferencesDialog pd = new PreferencesDialog( container, timeline.tp );
+			PreferencesDialog pd = new PreferencesDialog( container,
+					timeline.tp );
 			pd.showDialog();
 		}
 		else if( e.getActionCommand().equals( "exporttext" ) )
 		{
 			final JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter( new FileNameExtensionFilter( "Text Files", "txt" ) );
+			fc.addChoosableFileFilter( new FileNameExtensionFilter(
+					"Text Files", "txt" ) );
 			int returnVal = fc.showSaveDialog( container );
 			if( returnVal == JFileChooser.APPROVE_OPTION )
 			{
 				File f = fc.getSelectedFile();
-				try {
+				try
+				{
 					String filename = f.getAbsolutePath();
 					if( !filename.endsWith( ".txt" ) )
 					{
 						filename = filename + ".txt";
 					}
 					DFile.saveText( filename, timeline.toText() );
-				} catch (FileNotFoundException e1) {
+				}
+				catch( FileNotFoundException e1 )
+				{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -508,25 +557,188 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		else if( e.getActionCommand().equals( "exportxml" ) )
 		{
 			final JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter( new FileNameExtensionFilter( "XML Files", "xml" ) );
+			fc.addChoosableFileFilter( new FileNameExtensionFilter(
+					"XML Files", "xml" ) );
 			int returnVal = fc.showSaveDialog( container );
 			if( returnVal == JFileChooser.APPROVE_OPTION )
 			{
 				File f = fc.getSelectedFile();
-				try {
+				try
+				{
 					String filename = f.getAbsolutePath();
 					if( !filename.endsWith( ".xml" ) )
 					{
 						filename = filename + ".xml";
 					}
 					DFile.saveText( filename, timeline.toXml() );
-				} catch (FileNotFoundException e1) {
+				}
+				catch( FileNotFoundException e1 )
+				{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 		}
+		else if( e.getActionCommand().equals( "importxml" ) )
+		{
+			final JFileChooser fc = new JFileChooser();
+			fc.addChoosableFileFilter( new FileNameExtensionFilter( "XML Files", "xml" ) );
+			int returnVal = fc.showOpenDialog( container );
+			if( returnVal == JFileChooser.APPROVE_OPTION )
+			{
+				try
+				{
+					File f = fc.getSelectedFile();
+					DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+					Document doc = dBuilder.parse( f );
+					doc.getDocumentElement().normalize();
+					
+					NodeList nList = doc.getElementsByTagName( "item" );
+					
+					for( int temp = 0; temp < nList.getLength(); temp++ )
+					{
+						
+						Node nNode = nList.item( temp );
+						if( nNode.getNodeType() == Node.ELEMENT_NODE )
+						{
+							Element item = (Element)nNode;
+							String type = item.getAttribute( "type" );
+							if( type.equalsIgnoreCase( "span" ) )
+							{
+								try
+								{
+									String start = getTagValue( "start", item );
+									String end = getTagValue( "end", item );
+									String name = getTagValue( "name", item );
+									TDate startD = new TDate( start );
+									TDate endD = new TDate( end );
+									Span s = new Span( name, startD, endD );
+									
+									try
+									{
+									String priority = getTagValue( "priority", item );
+									if( priority != null )
+										s.priority = Integer.parseInt( priority );
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String tags = getTagValue( "tags", item );
+									if( tags != null )
+									{
+										String[] tagA = tags.split( "," );
+										for( int i = 0; i < tagA.length; i++ )
+										{
+											s.tags.add( tagA[i] );
+										}
+									}
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String link = getTagValue( "link", item );
+									if( link != null )
+										s.data.add( new DoubleString( "link", link ) );
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String description = getTagValue( "description", item );
+									if( description != null )
+										s.data.add( new DoubleString( "desc", description ) );
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String location = getTagValue( "location", item );
+									if( location != null )
+										s.data.add( new DoubleString( "loc", location ) );
+									} catch( Exception ex ) {}
+									
+									timeline.add( s );
+								}
+								catch( Exception ex )
+								{
+									continue;
+								}
+							}
+							else
+							{
+								try
+								{
+									String date = getTagValue( "date", item );
+									String name = getTagValue( "name", item );
+									TDate dateD = new TDate( date );
+									Event s = new Event( name, dateD );
+									
+									try
+									{
+									String priority = getTagValue( "priority", item );
+									if( priority != null )
+										s.priority = Integer.parseInt( priority );
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String tags = getTagValue( "tags", item );
+									if( tags != null )
+									{
+										String[] tagA = tags.split( "," );
+										for( int i = 0; i < tagA.length; i++ )
+										{
+											s.tags.add( tagA[i] );
+										}
+									}
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String link = getTagValue( "link", item );
+									if( link != null )
+										s.data.add( new DoubleString( "link", link ) );
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String description = getTagValue( "description", item );
+									if( description != null )
+										s.data.add( new DoubleString( "desc", description ) );
+									} catch( Exception ex ) {}
+									
+									try
+									{
+									String location = getTagValue( "location", item );
+									if( location != null )
+										s.data.add( new DoubleString( "loc", location ) );
+									} catch( Exception ex ) {}
+									
+									timeline.add( s );
+								}
+								catch( Exception ex )
+								{
+									continue;
+								}
+							}
+							
+						}
+					}
+				}
+				catch( Exception exception )
+				{
+					
+				}
+			}
+		}
 		container.requestFocus();
+	}
+	
+	private static String getTagValue( String sTag, Element eElement )
+	{
+		NodeList nlList = eElement.getElementsByTagName( sTag ).item( 0 ).getChildNodes();
+		Node nValue = (Node)nlList.item( 0 );
+		
+		return nValue.getNodeValue();
 	}
 	
 	public void editItem( Item i )
@@ -562,13 +774,13 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 			if( added )
 			{
 				timeline.add( i );
-				timeline.centerDate = i.getCenter();
+				timeline.setCenter( i.getCenter() );
 			}
 			timelineChanged();
 		}
 	}
-
-	public void mouseClicked( MouseEvent e ) 
+	
+	public void mouseClicked( MouseEvent e )
 	{
 		if( e.getButton() == MouseEvent.BUTTON1 )
 		{
@@ -581,53 +793,55 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 		}
 		container.requestFocus();
 	}
-
+	
 	public void mouseEntered( MouseEvent e )
 	{
 		
 	}
-
+	
 	public void mouseExited( MouseEvent e )
 	{
 		
 	}
-
-	public void mousePressed( MouseEvent e ) 
+	
+	public void mousePressed( MouseEvent e )
 	{
 		if( e.isPopupTrigger() )
 		{
-			rcmenu.show( e.getX(), e.getY(), timeline.getItem( e.getX(), e.getY() ) );
+			rcmenu.show( e.getX(), e.getY(), timeline.getItem( e.getX(), e
+					.getY() ) );
 		}
 	}
-
+	
 	public void mouseReleased( MouseEvent e )
 	{
 		if( e.isPopupTrigger() )
 		{
-			rcmenu.show( e.getX(), e.getY(), timeline.getItem( e.getX(), e.getY() ) );
+			rcmenu.show( e.getX(), e.getY(), timeline.getItem( e.getX(), e
+					.getY() ) );
 		}
 	}
-
-	public void mouseWheelMoved( MouseWheelEvent e ) 
+	
+	public void mouseWheelMoved( MouseWheelEvent e )
 	{
 		float rot = e.getWheelRotation();
 		if( rot < 0 )
 		{
-			timeline.zoomIn( -e.getWheelRotation() * .08f );
+			timeline.zoomIn( -e.getWheelRotation() * .8f );
 		}
 		else
 		{
-			timeline.zoomOut( e.getWheelRotation() * .08f );
+			timeline.zoomOut( e.getWheelRotation() * .8f );
 		}
 		
 		timelineChanged();
 	}
-
-	public void mouseDragged( MouseEvent e ) 
+	
+	public void mouseDragged( MouseEvent e )
 	{
 		if( e.getButton() == MouseEvent.BUTTON1 || true )
 		{
-			float diff = (lastX - e.getX()) * .07f;
+			float diff = (lastX - e.getX()) * .7f;
 			if( diff > 0 )
 			{
 				timeline.scrollLeft( -diff );
@@ -641,21 +855,21 @@ public class TimelineRun implements KeyListener, ComponentListener, ActionListen
 			lastX = e.getX();
 		}
 	}
-
-	public void mouseMoved( MouseEvent e ) 
+	
+	public void mouseMoved( MouseEvent e )
 	{
 		timeline.hover = timeline.getItem( e.getX(), e.getY() );
 		timelineChanged();
 		
 		lastX = e.getX();
 	}
-
+	
 	public void stateChanged( ChangeEvent e )
 	{
 		timeline.priority = priority.getValue();
 		timelineChanged();
 	}
-
+	
 	public void deleteItem( Item item )
 	{
 		timeline.items.remove( item );

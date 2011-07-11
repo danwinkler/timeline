@@ -30,4 +30,12 @@ public class RenderLines
 			r.text( lines.get( i ), x, y + separation * i );
 		}
 	}
+
+	public void render( Renderer r, int maxLength )
+	{
+		for( int i = 0; i < Math.min( lines.size(), maxLength ); i++ )
+		{
+			r.text( lines.get( i ), x, y + separation * i );
+		}
+	}
 }
