@@ -9,6 +9,7 @@ public interface Item extends Serializable, Comparable<Item>
 {
 	public boolean isVisible( TDate d, TDate lastDate );
 	
+	public String getName();
 	public int getPriority();
 	public ArrayList<String> getTags();
 	public ArrayList<DoubleString> getData();
@@ -17,4 +18,6 @@ public interface Item extends Serializable, Comparable<Item>
 	public void renderInfo( Renderer r );
 
 	public TDate getCenter();
+
+	public void setPriority( int priority );
 }

@@ -292,7 +292,7 @@ public class EditSpanDialog implements ActionListener
 			int iyear;
 			try { iyear = Integer.parseInt( eyear ); } catch( NumberFormatException nfe ) { iyear = 0; }
 			int imonth;
-			try { imonth = Integer.parseInt( emonth ); } catch( NumberFormatException nfe ) { imonth = 0; }
+			try { imonth = Integer.parseInt( emonth ); } catch( NumberFormatException nfe ) { imonth = TDate.getMonthByName( emonth ); }
 			int iday;
 			try { iday = Integer.parseInt( eday ); } catch( NumberFormatException nfe ) { iday = 0; }
 			int ihour;
@@ -316,7 +316,7 @@ public class EditSpanDialog implements ActionListener
 			int ifyear;
 			try { ifyear = Integer.parseInt( efyear ); } catch( NumberFormatException nfe ) { ifyear = 0; }
 			int ifmonth;
-			try { ifmonth = Integer.parseInt( efmonth ); } catch( NumberFormatException nfe ) { ifmonth = 0; }
+			try { ifmonth = Integer.parseInt( efmonth ); } catch( NumberFormatException nfe ) { ifmonth = TDate.getMonthByName( efmonth ); }
 			int ifday;
 			try { ifday = Integer.parseInt( efday ); } catch( NumberFormatException nfe ) { ifday = 0; }
 			int ifhour;

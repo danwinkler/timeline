@@ -38,29 +38,49 @@ public class TDate implements Serializable
 	
 	public TDate( String date ) throws NumberFormatException
 	{
-		String[] parts = date.split( "/" );
-		for( int i = 0; i < parts.length; i++ )
+		if( date.contains( "/" ) )
 		{
-			switch( i )
+			String[] parts = date.split( "/" );
+			for( int i = 0; i < parts.length; i++ )
 			{
-			case 0:
-				year = Integer.parseInt( parts[i] );
-				break;
-			case 1:
-				month = Integer.parseInt( parts[i] );
-				break;
-			case 2:
-				day = Integer.parseInt( parts[i] );
-				break;
-			case 3:
-				hour = Integer.parseInt( parts[i] );
-				break;
-			case 4:
-				minute = Integer.parseInt( parts[i] );
-				break;
-			case 5:
-				second = Integer.parseInt( parts[i] );
-				break;
+				switch( i )
+				{
+				case 0:
+					year = Integer.parseInt( parts[i] );
+					break;
+				case 1:
+					month = Integer.parseInt( parts[i] );
+					break;
+				case 2:
+					day = Integer.parseInt( parts[i] );
+					break;
+				case 3:
+					hour = Integer.parseInt( parts[i] );
+					break;
+				case 4:
+					minute = Integer.parseInt( parts[i] );
+					break;
+				case 5:
+					second = Integer.parseInt( parts[i] );
+					break;
+				}
+			}
+		}
+		else
+		{
+			String[] parts = date.split( "[\\s,]+" );
+			int length = parts.length;
+			if( length == 1 )
+			{
+				year = Integer.parseInt( parts[0].trim() );
+			}
+			else if( length == 2 )
+			{
+				
+			}
+			else if( length == 3 )
+			{
+				
 			}
 		}
 	}
@@ -210,6 +230,34 @@ public class TDate implements Serializable
 		case 12: return "December";
 		default: return "";
 		}
+	}
+	
+	public static final String[] months = { "January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December" };
+	
+	public static int getMonthByName( String month )
+	{
+		if( month.trim().equals( "" ) )
+			return 0;
+		for( int i = 0; i < months.length; i++ )
+		{
+			if( months[i].toLowerCase().startsWith( month.trim().toLowerCase() ) )
+			{
+				return i+1;
+			}
+		}
+			
+		return 0;
 	}
 	
 	public static boolean isLeapYear( int year )

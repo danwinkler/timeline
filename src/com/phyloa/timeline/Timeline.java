@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import timeline.DoubleString;
 import timeline.Event;
 import timeline.Item;
 import timeline.Span;
@@ -39,6 +40,8 @@ public class Timeline
 	ArrayList<String> tags = new ArrayList<String>();
 	
 	TimelinePreferences tp = new TimelinePreferences();
+	
+	String notes = "";
 	
 	public Timeline( Renderer r )
 	{
@@ -455,5 +458,249 @@ public class Timeline
 		diff /= 2;
 		firstDate = center.addMonths( (int) -diff );
 		lastDate = center.addMonths( (int) diff );
+	}
+	
+	public Item getItemByName( String name )
+	{
+		for( int i = 0; i < items.size(); i++ )
+		{
+			if( items.get( i ).getName().equalsIgnoreCase( name ) )
+			{
+				return items.get( i );
+			}
+		}
+		return null;
+	}
+	
+	public void updateNotesFromTimeline()
+	{
+		StringBuilder sb = new StringBuilder();
+		String[] oldLines = notes.split( "\n" );
+		Item current = null;
+		ArrayList<Item> handled = new ArrayList<Item>();
+		for( int i = 0; i < oldLines.length; i++ )
+		{
+			//Not current adding to an item
+			if( current == null )
+			{
+				String trimmedLine = oldLines[i].trim();
+				//Found an item
+				if( trimmedLine.startsWith( "*" ) )
+				{
+					int indexOfStar = trimmedLine.indexOf( '*' );
+					String name = trimmedLine.substring( indexOfStar+1, trimmedLine.length() ).trim();
+					//Find name of item
+					current = getItemByName( name );
+					//If Item doesn't exist, Ignore
+					if( current == null )
+					{
+						sb.append( oldLines[i] + "\n" );
+						while( true )
+						{
+							i++;
+							sb.append( oldLines[i] + "\n" );
+							if( oldLines[i].trim().startsWith( "*" ) )
+							{
+								break;
+							}
+						}
+					}
+					else
+					{
+						handled.add( current );
+						sb.append( itemToNotes( current ) );
+						//Get rid of old stuff
+						while( true )
+						{
+							i++;
+							if( oldLines[i].trim().startsWith( "*" ) )
+							{
+								break;
+							}
+						}
+						current = null;
+					}
+				}
+				else
+				{
+					sb.append( oldLines[i] + "\n" );
+				}
+			}
+		}
+		
+		for( int i = 0; i < items.size(); i++ )
+		{
+			if( !handled.contains( items.get( i ) ) )
+			{
+				sb.append( itemToNotes( items.get( i ) ) );
+				sb.append( "\n" );
+			}
+		}
+		
+		notes = sb.toString();
+	}
+	
+	public void updateTimelineFromNotes()
+	{
+		items.clear();
+		String[] newNotes = notes.split( "\n" );
+		for( int i = 0; i < newNotes.length; i++ )
+		{
+			String trimmedLine = newNotes[i].trim();
+			if( trimmedLine.startsWith( "*" ) )
+			{
+				boolean failed = false;
+				int indexOfStar = trimmedLine.indexOf( '*' );
+				String name = trimmedLine.substring( indexOfStar+1, trimmedLine.length() ).trim();
+				Item current = getItemByName( name );
+				if( current == null )
+				{
+					//New Item, find if span or event
+					i++;
+					Item newI = null;
+					String date = newNotes[i].trim();
+					if( date.contains( "-" ) )
+					{
+						String[] dates = date.split( "-" );
+						//Span
+						try
+						{
+						newI = new Span( name, new TDate( dates[0].trim() ), new TDate( dates[1].trim() ) );
+						} catch( Exception ex )
+						{
+							failed = true;
+						}
+					}
+					else
+					{
+						//Event
+						try
+						{
+						newI = new Event( name, new TDate( date ) );
+						} catch( Exception ex )
+						{
+							failed = true;
+						}
+					}
+					if( !failed )
+					{
+						while( true )
+						{
+							i++;
+							String line = newNotes[i].trim();
+							if( line.startsWith( "Location:" ) )
+							{
+								newI.setData( "loc", line.split( ":", 2 )[1].trim() );
+							} else if( line.startsWith( "Priority:" ) )
+							{
+								try {
+								newI.setPriority( Integer.parseInt( line.split( ":", 2 )[1].trim() ) );
+								} catch( Exception ex ) {}
+							} else if( line.startsWith( "Tags:" ) )
+							{
+								String[] tags = line.split( ":", 2 )[1].trim().split( "," );
+								newI.getTags().clear();
+								for( int j = 0; j < tags.length; j++ )
+								{
+									newI.getTags().add( tags[j] );
+								}
+							} else if( line.startsWith( "Link:" ) )
+							{
+								newI.setData( "link", line.split( ":", 2 )[1].trim() );
+							} else if( line.startsWith( "*" ) )
+							{
+								break;
+							} else
+							{
+								String desc = line;
+								i++;
+								while( true )
+								{
+									if( newNotes[i].trim().startsWith( "*" ) )
+									{
+										break;
+									}
+									desc += newNotes[i] + "\n";
+									i++;
+								}
+								newI.setData( "desc", desc );
+								break;
+							}
+						}
+						items.add( newI );
+					}
+					else
+					{
+						//Fail, get to next *
+						while( true )
+						{
+							i++;
+							if( newNotes[i].trim().startsWith( "*" ) )
+							{
+								break;
+							}
+						}
+					}
+					
+				}
+				else
+				{
+					//Old item, update item from notes
+				}
+			}
+		}
+	}
+	
+	public String itemToNotes( Item current )
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append( "* " + current.getName() + "\n" ); //Name
+		if( current instanceof Span )
+		{
+			Span cSpan = (Span)current;
+			sb.append( cSpan.start.toString() + " - " + cSpan.end.toString() + "\n" );
+		}
+		else
+		{
+			sb.append( current.getCenter().toString() + "\n" );
+		}
+		if( current.getPriority() != 0 )
+		{
+			sb.append( "Priority: " + current.getPriority() + "\n" );
+		}
+		if( current.getTags().size() > 0 && !current.getTags().get( 0 ).trim().equals( "" ) )
+		{
+			sb.append( "Tags: " );
+			for( int j = 0; j < current.getTags().size(); j++ )
+			{
+				sb.append( current.getTags().get( j ) );
+				if( j < current.getTags().size()-1 )
+				{
+					sb.append( ", " );
+				}
+			}
+			sb.append( "\n" );
+		}
+		ArrayList<DoubleString> data = current.getData();
+		for( DoubleString ds : data )
+		{
+			if( ds.a.equals( "link" ) )
+			{
+				if( !ds.b.trim().equals( "" ) )
+					sb.append( "Link: " + ds.b + "\n" );
+			}
+			else if( ds.a.equals( "loc" ) )
+			{
+				if( !ds.b.trim().equals( "" ) )
+					sb.append( "Location: " + ds.b + "\n" );
+			}
+			else if( ds.a.equals( "desc" ) )
+			{
+				if( !ds.b.trim().equals( "" ) )
+					sb.append( ds.b + "\n" );
+			}
+		}
+		sb.append( "*\n" );
+		return sb.toString();
 	}
 }

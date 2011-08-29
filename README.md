@@ -4,6 +4,10 @@
 
 #Changelog
 
+* 0.4b
+	* Fixed arrow keys being slow to move timeline
+	* Added notes pane, which syncs notes with timeline
+	* Can now enter in name of months in adding new items
 * 0.3b
 	* Added XML Import
 	* Changed How zoom works

@@ -29,7 +29,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -71,15 +74,18 @@ public class TimelineRun implements KeyListener, ComponentListener,
 	public RightClickMenu rcmenu;
 	public JSlider priority;
 	public JTextField tags;
+	public JTextArea notes;
+	public JTabbedPane tabbedPane;
 	
 	int lastX;
+	
+	boolean showNotes = false;
 	
 	public TimelineRun()
 	{
 		try
 		{
-			UIManager
-					.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 		}
 		catch( ClassNotFoundException e )
 		{
@@ -107,6 +113,16 @@ public class TimelineRun implements KeyListener, ComponentListener,
 		container.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		container.addKeyListener( this );
 		container.addMouseWheelListener( this );
+		
+		tabbedPane = new JTabbedPane();
+		tabbedPane.addChangeListener( this );
+		container.getContentPane().add( tabbedPane );
+		
+		JPanel timelinePane = new JPanel( new BorderLayout() );
+		JPanel notesPane = new JPanel( new BorderLayout() );
+		
+		tabbedPane.addTab( "Timeline", timelinePane );
+		tabbedPane.addTab( "Notes", notesPane );
 		
 		menubar = new JMenuBar();
 		container.setJMenuBar( menubar );
@@ -200,26 +216,7 @@ public class TimelineRun implements KeyListener, ComponentListener,
 		toolbar.setFloatable( false );
 		toolbar.setFocusable( false );
 		toolbar.setLayout( new MigLayout( "align center center" ) );
-		container.getContentPane().add( toolbar, BorderLayout.SOUTH );
-		
-		/*
-		 * JButton fastBack = new JButton( "RW" ); fastBack.setMargin( new
-		 * Insets( 10, 10, 10, 10 ) ); fastBack.setActionCommand( "fastback" );
-		 * fastBack.addActionListener( this ); toolbar.add( fastBack );
-		 * 
-		 * JButton back = new JButton( "Back" ); back.setMargin( new Insets( 10,
-		 * 10, 10, 10 ) ); back.setActionCommand( "back" );
-		 * back.addActionListener( this ); toolbar.add( back );
-		 * 
-		 * JButton forward = new JButton( "Forward" ); forward.setMargin( new
-		 * Insets( 10, 10, 10, 10 ) ); forward.setActionCommand( "forward" );
-		 * forward.addActionListener( this ); toolbar.add( forward );
-		 * 
-		 * JButton fastForward = new JButton( "FF" ); fastForward.setMargin( new
-		 * Insets( 10, 10, 10, 10 ) ); fastForward.setActionCommand(
-		 * "fastforward" ); fastForward.addActionListener( this ); toolbar.add(
-		 * fastForward );
-		 */
+		timelinePane.add( toolbar, BorderLayout.SOUTH );
 
 		priority = new JSlider( 0, 100, 0 );
 		priority.setMajorTickSpacing( 10 );
@@ -250,7 +247,13 @@ public class TimelineRun implements KeyListener, ComponentListener,
 		toolbar.add( tagsPanel );
 		
 		ip = new ImagePanel( r.getImage() );
-		container.getContentPane().add( ip, BorderLayout.CENTER );
+		timelinePane.add( ip, BorderLayout.CENTER );
+		
+		//Notes
+		notes = new JTextArea();
+		JScrollPane notesScroll = new JScrollPane( notes );
+		notesPane.add( notesScroll, BorderLayout.CENTER );
+		//End Notes
 		
 		container.pack();
 		container.setVisible( true );
@@ -294,19 +297,19 @@ public class TimelineRun implements KeyListener, ComponentListener,
 			switch( e.getKeyCode() )
 			{
 			case KeyEvent.VK_UP:
-				timeline.zoomIn( .1f );
+				timeline.zoomIn( 2f );
 				timelineChanged();
 				break;
 			case KeyEvent.VK_DOWN:
-				timeline.zoomOut( .1f );
+				timeline.zoomOut( 2f );
 				timelineChanged();
 				break;
 			case KeyEvent.VK_LEFT:
-				timeline.scrollLeft( 1 );
+				timeline.scrollLeft( 10 );
 				timelineChanged();
 				break;
 			case KeyEvent.VK_RIGHT:
-				timeline.scrollRight( 1 );
+				timeline.scrollRight( 10 );
 				timelineChanged();
 				break;
 			}
@@ -427,6 +430,7 @@ public class TimelineRun implements KeyListener, ComponentListener,
 					timeline.firstDate = dat.centerDate;
 					timeline.lastDate = dat.lastDate;
 					timeline.items = dat.items;
+					timeline.notes = dat.notes;
 					timeline.file = f;
 					timeline.tp = dat.tp == null ? new TimelinePreferences()
 							: dat.tp;
@@ -441,6 +445,7 @@ public class TimelineRun implements KeyListener, ComponentListener,
 			dat.lastDate = timeline.lastDate;
 			dat.items = timeline.items;
 			dat.tp = timeline.tp;
+			dat.notes = timeline.notes;
 			if( timeline.file == null )
 			{
 				final JFileChooser fc = new JFileChooser();
@@ -492,6 +497,7 @@ public class TimelineRun implements KeyListener, ComponentListener,
 				dat.lastDate = timeline.lastDate;
 				dat.items = timeline.items;
 				dat.tp = timeline.tp;
+				dat.notes = timeline.notes;
 				try
 				{
 					String filename = f.getAbsolutePath();
@@ -525,7 +531,7 @@ public class TimelineRun implements KeyListener, ComponentListener,
 		}
 		else if( e.getActionCommand().equals( "settings" ) )
 		{
-			PreferencesDialog pd = new PreferencesDialog( container,
+			SettingsDialog pd = new SettingsDialog( container,
 					timeline.tp );
 			pd.showDialog();
 		}
@@ -866,8 +872,27 @@ public class TimelineRun implements KeyListener, ComponentListener,
 	
 	public void stateChanged( ChangeEvent e )
 	{
-		timeline.priority = priority.getValue();
-		timelineChanged();
+		if( e.getSource() == priority )
+		{
+			timeline.priority = priority.getValue();
+			timelineChanged();
+		}
+		else if( e.getSource() == tabbedPane )
+		{
+			if( tabbedPane.getSelectedIndex() == 0 )
+			{
+				if( timeline != null )
+				{
+					timeline.notes = notes.getText();
+					timeline.updateTimelineFromNotes();
+				}
+			}
+			else if( tabbedPane.getSelectedIndex() == 1 )
+			{
+				timeline.updateNotesFromTimeline();
+				notes.setText( timeline.notes );
+			}
+		}
 	}
 	
 	public void deleteItem( Item item )

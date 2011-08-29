@@ -213,7 +213,7 @@ public class EditEventDialog implements ActionListener
 			int iyear;
 			try { iyear = Integer.parseInt( eyear ); } catch( NumberFormatException nfe ) { iyear = 0; }
 			int imonth;
-			try { imonth = Integer.parseInt( emonth ); } catch( NumberFormatException nfe ) { imonth = 0; }
+			try { imonth = Integer.parseInt( emonth ); } catch( NumberFormatException nfe ) { imonth = TDate.getMonthByName( emonth ); }
 			int iday;
 			try { iday = Integer.parseInt( eday ); } catch( NumberFormatException nfe ) { iday = 0; }
 			int ihour;

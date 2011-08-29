@@ -18,4 +18,5 @@ public class TimelineData implements Serializable
 	public float zoom = 12; //DEPRECATED
 	public ArrayList<Item> items = new ArrayList<Item>();
 	public TimelinePreferences tp;
+	public String notes;
 }

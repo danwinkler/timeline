@@ -133,4 +133,15 @@ public class Span implements Item
 		}
 		return -1;
 	}
+
+	@Override
+	public String getName()
+	{
+		return name;
+	}
+	
+	public void setPriority( int priority )
+	{
+		this.priority = priority;
+	}
 }
